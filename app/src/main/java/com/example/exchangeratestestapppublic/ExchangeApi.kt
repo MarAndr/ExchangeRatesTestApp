@@ -2,7 +2,6 @@ package com.example.exchangeratestestapppublic
 
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -11,9 +10,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ExchangeApi {
-
-
-//    access_key: l44cH4lb0vizrlUpGDWo3rEbT5Ec11SI
 
         @GET("exchangerates_data/latest")
         suspend fun getLatestCurrency(

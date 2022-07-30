@@ -7,11 +7,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ExchangeViewModel : ViewModel() {
-    val repo = ExchangeRepository(ExchangeApi.getApi())
+    private val repo = ExchangeRepository(ExchangeApi.getApi())
+
     private val _state = MutableStateFlow(LatestCurrencyResponse())
     val state: StateFlow<LatestCurrencyResponse> = _state
 
-    fun getLatestCurrency() {
+    init {
+        try {
+           getLatestCurrency()
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
+    }
+
+
+    private fun getLatestCurrency() {
         viewModelScope.launch {
             _state.value = repo.getLatestCurrency("USD")
         }
