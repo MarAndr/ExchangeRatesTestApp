@@ -2,6 +2,9 @@ package com.example.exchangeratestestapppublic
 
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import okhttp3.ResponseBody
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
@@ -10,24 +13,26 @@ import retrofit2.http.Query
 
 interface ExchangeApi {
 
-        @GET("/latest")
+
+//    access_key: l44cH4lb0vizrlUpGDWo3rEbT5Ec11SI
+
+        @GET("/latest /latest\n" +
+                "    ? access_key = l44cH4lb0vizrlUpGDWo3rEbT5Ec11SI\n" +
+                "    & base = USD\n" +
+                "    & symbols = GBP,JPY,EUR")
         suspend fun getLatestCurrency(): Currency
 
-//        @GET("/jokes/categories")
-//        suspend fun getJokesCategories(): List<JokeCategory>
-//
-//        @GET("/jokes/random")
-//        suspend fun getRandomJokeByCategory(
-//            @Query("category") category: String
-//        ): NorrisJoke
+
 
         companion object{
             fun getApi(): ExchangeApi{
-                val httpClient = OkHttpClient.Builder()
+                val httpClient = OkHttpClient
+                    .Builder()
+                    .addNetworkInterceptor(HttpLoggingInterceptor())
                     .build()
 
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("https://api.exchangeratesapi.io")
+                    .baseUrl("https://api.exchangeratesapi.io/v1/")
                     .client(httpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
