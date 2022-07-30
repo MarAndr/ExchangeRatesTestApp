@@ -18,7 +18,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            try {
             viewModel.getLatestCurrency()
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
             val state = viewModel.state.collectAsState().value
             Log.d("MY_TAG", "$state")
         }
