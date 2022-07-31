@@ -1,7 +1,7 @@
 package com.example.exchangeratestestapppublic
 
 import android.app.Application
-import com.example.checkit.data.db.Database
+import com.example.exchangeratestestapppublic.db.Database
 
 class App : Application() {
     override fun onCreate() {

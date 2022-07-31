@@ -33,10 +33,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val state = viewModel.state.collectAsState().value
+            viewModel.getCurrencyNamesList()
+            val currencyNames =
+                viewModel.currencyNames.collectAsState().value.symbols?.map { (currency: String, currencyFullName: String) ->
+                    "$currencyFullName ($currency)"
+                }
             val mainScreenState = viewModel.mainScreen.collectAsState().value
-            val currencyNames = state.rates?.map { (currencyName: String, rate: Double) ->
-                currencyName
-            }
+
 
             val currencyRates = state.rates?.map { (currencyName: String, rate: Double) ->
                 rate
@@ -70,6 +73,7 @@ fun TopBar(items: List<String>) {
         DropdownMenu(items)
     }
 }
+
 
 @Composable
 fun DropdownMenu(items: List<String>) {

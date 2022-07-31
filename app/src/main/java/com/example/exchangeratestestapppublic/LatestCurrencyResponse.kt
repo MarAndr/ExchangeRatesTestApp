@@ -11,3 +11,8 @@ data class LatestCurrencyResponse(
     val rates: Map<String, Double>? = null
 )
 
+data class CurrencyName(
+    val success: Boolean? = null,
+    val symbols: Map<String, String>? = null
+)
+

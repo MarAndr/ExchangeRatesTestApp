@@ -11,6 +11,8 @@ class ExchangeViewModel : ViewModel() {
 
     private val _state = MutableStateFlow(LatestCurrencyResponse())
     val state: StateFlow<LatestCurrencyResponse> = _state
+    private val _currencyNames = MutableStateFlow(CurrencyName())
+    val currencyNames: StateFlow<CurrencyName> = _currencyNames
     private val _mainScreen = MutableStateFlow(MainScreenState())
     val mainScreen: StateFlow<MainScreenState> = _mainScreen
 
@@ -32,6 +34,12 @@ class ExchangeViewModel : ViewModel() {
     private fun getLatestCurrency() {
         viewModelScope.launch {
             _state.value = repo.getLatestCurrency("USD")
+        }
+    }
+
+    fun getCurrencyNamesList() {
+        viewModelScope.launch {
+            _currencyNames.value = repo.getCurrencyNamesList()
         }
     }
 

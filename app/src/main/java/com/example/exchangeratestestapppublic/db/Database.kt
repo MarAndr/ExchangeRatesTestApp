@@ -1,7 +1,6 @@
-package com.example.checkit.data.db
+package com.example.exchangeratestestapppublic.db
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Room
 
 object Database {
