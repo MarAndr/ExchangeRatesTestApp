@@ -1,6 +1,7 @@
 package com.example.exchangeratestestapppublic
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -31,53 +32,71 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
-            
 //            val state = viewModel.state.collectAsState().value
 //            viewModel.getCurrencyNamesList()
 //            val currencyNames =
 //                viewModel.currencyNames.collectAsState().value.symbols?.map { (currency: String, currencyFullName: String) ->
 //                    "$currencyFullName ($currency)"
 //                }
-//            val mainScreenState = viewModel.mainScreen.collectAsState().value
-//
-//
-//            val currencyRates = state.rates?.map { (currencyName: String, rate: Double) ->
-//                rate
-//            }
-//            Scaffold(
-//                topBar = {
-//                    if (currencyNames != null) {
-//                        TopBar(currencyNames)
-//                    }
-//                },
-//                bottomBar = {
-//                    BottomBar(viewModel = viewModel)
-//                }
-//            ) {
-//                when (mainScreenState.activeScreen) {
-//                    Screen.POPULAR -> MainScreen(
-//                        currencyNames = currencyNames,
-//                        currencyRates = currencyRates
-//                    )
-//                    Screen.FAVORITE -> Text(text = "Favorite")
-//                }
-//            }
+            var chosenCurrency: String? by remember {
+                mutableStateOf(null)
+            }
+            Log.d("MY_TAG", "chosenCurrency = $chosenCurrency")
+            val mainScreenState = viewModel.mainScreen.collectAsState().value
+            val state =
+                viewModel.getCurrencyRates(base = if (chosenCurrency == null) "USD" else chosenCurrency)
+                    .collectAsState(initial = null).value
+            val quotes = state?.map {
+                it.quote
+            }
+
+            Scaffold(
+                topBar = {
+                    TopBar(quotes ?: emptyList()) {
+                        chosenCurrency = it
+                    }
+                },
+                bottomBar = {
+                    BottomBar(viewModel = viewModel)
+                }
+            ) {
+                when (mainScreenState.activeScreen) {
+                    Screen.POPULAR -> MainScreen(
+                        currencyNames = quotes,
+                        currencyRates = emptyList()
+                    )
+                    Screen.FAVORITE -> Text(text = "Favorite")
+                }
+            }
         }
     }
+
+//    fun getResult(callback: (List<String>) -> Unit) {
+//        val list = mutableListOf<CurrencyRatesModel>()
+//        lifecycleScope.launch {
+//            viewModel.getCurrencyRates().collect() { currencyRates ->
+//                currencyRates.map {
+//                    list.add(it.quote)
+//                }
+//            }
+//            callback(list)
+//        }
+//    }
 }
 
 
 @Composable
-fun TopBar(items: List<String>) {
+fun TopBar(items: List<String>, onClick: (String) -> Unit) {
     Surface(elevation = 8.dp, modifier = Modifier.height(75.dp)) {
-        DropdownMenu(items)
+        DropdownMenu(items, onClick)
     }
 }
 
 
 @Composable
-fun DropdownMenu(items: List<String>) {
+fun DropdownMenu(items: List<String>, onClick: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     val disabledValue = "B"
     var selectedIndex: Int? by remember { mutableStateOf(null) }
@@ -89,6 +108,7 @@ fun DropdownMenu(items: List<String>) {
         contentAlignment = Alignment.Center
     ) {
         if (selectedIndex != null) {
+            onClick(items[selectedIndex!!])
             Text(
                 text = items[selectedIndex!!],
                 style = MaterialTheme.typography.h5

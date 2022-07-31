@@ -8,11 +8,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CurrencyRatesDao {
-    //    @Query("select * from ${CurrencyContract.CURRENCY_RATES_TABLE_NAME} where ${CurrencyContract.CurrencyRatesColumn.BASE} = :base")
-//    @Query("select * from ${CurrencyContract.CURRENCY_RATES_TABLE_NAME}")
-    @Query("select * from CurrencyRatesModel where base = :base")
-    suspend fun getCurrencyRates(base: String): Flow<List<CurrencyRatesModel>>
+    @Query("select * from ${CurrencyRatesContract.CURRENCY_RATES_TABLE_NAME} where ${CurrencyRatesContract.CurrencyRatesColumn.BASE} = :base")
+    fun getCurrencyRates(base: String): Flow<List<CurrencyRatesModel>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addCurrencyRates(currencyRatesModel: CurrencyRatesModel)
+    fun addCurrencyRates(currencyRatesModel: CurrencyRatesModel)
 }

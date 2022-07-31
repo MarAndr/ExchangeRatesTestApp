@@ -1,11 +1,13 @@
 package com.example.exchangeratestestapppublic
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.exchangeratestestapppublic.api.ExchangeApi
-import com.example.exchangeratestestapppublic.api.LatestCurrencyResponse
+import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 import com.example.exchangeratestestapppublic.db.Database
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,8 +16,13 @@ class ExchangeViewModel : ViewModel() {
     private val repo =
         ExchangeRepository(ExchangeApi.getApi(), Database.instance.currencyRatesDao())
 
-    private val _state = MutableStateFlow(LatestCurrencyResponse())
-    val state: StateFlow<LatestCurrencyResponse> = _state
+    fun getCurrencyRates(base: String?): Flow<List<CurrencyRatesModel>> {
+        Log.d("MY_TAG", "${repo.getCurrencyRates("USD")}")
+        return repo.getCurrencyRates(base ?: "")
+    }
+
+    private val _state = MutableStateFlow(emptyList<CurrencyRatesModel>())
+    val state: StateFlow<List<CurrencyRatesModel>> = _state
 
     //    private val _currencyNames = MutableStateFlow(CurrencyName())
 //    val currencyNames: StateFlow<CurrencyName> = _currencyNames
