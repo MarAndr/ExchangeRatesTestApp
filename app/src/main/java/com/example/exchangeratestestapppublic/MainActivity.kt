@@ -34,32 +34,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-//            val state = viewModel.state.collectAsState().value
-//            viewModel.getCurrencyNamesList()
-//            val currencyNames =
-//                viewModel.currencyNames.collectAsState().value.symbols?.map { (currency: String, currencyFullName: String) ->
-//                    "$currencyFullName ($currency)"
-//                }
+
             var chosenCurrency: String? by remember {
                 mutableStateOf(null)
             }
             Log.d("MY_TAG", "chosenCurrency = $chosenCurrency")
             val mainScreenState = viewModel.mainScreen.collectAsState().value
-            val state =
-                viewModel.getCurrencyRates(base = if (chosenCurrency == null) "USD" else chosenCurrency)
-                    .collectAsState(initial = null).value
-            val quotes = state?.map {
-                it.quote
-            }
+
+            val currencyRates by viewModel.getCurrencyRates(
+                base = "USD"
+            ).collectAsState(initial = emptyList())
+            val quotes by viewModel.quotes("USD").collectAsState()
 
             Scaffold(
                 topBar = {
-                    TopBar(quotes ?: emptyList()) {
+                    TopBar(quotes) {
                         chosenCurrency = it
                     }
                 },
                 bottomBar = {
-                    BottomBar(viewModel = viewModel)
+                    BottomBar(viewModel = viewModel, state = mainScreenState)
                 }
             ) {
                 when (mainScreenState.activeScreen) {
@@ -72,18 +66,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-//    fun getResult(callback: (List<String>) -> Unit) {
-//        val list = mutableListOf<CurrencyRatesModel>()
-//        lifecycleScope.launch {
-//            viewModel.getCurrencyRates().collect() { currencyRates ->
-//                currencyRates.map {
-//                    list.add(it.quote)
-//                }
-//            }
-//            callback(list)
-//        }
-//    }
 }
 
 
@@ -171,7 +153,7 @@ fun MainScreen(currencyNames: List<String>?, currencyRates: List<Double>?) {
 }
 
 @Composable
-fun BottomBar(viewModel: ExchangeViewModel) {
+fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
     Surface(elevation = 8.dp, modifier = Modifier.height(75.dp)) {
         Row(
             modifier = Modifier
@@ -180,6 +162,11 @@ fun BottomBar(viewModel: ExchangeViewModel) {
         ) {
             Box(
                 modifier = Modifier
+                    .background(
+                        color = if (state.activeScreen == Screen.POPULAR) {
+                            Color.Blue.copy(alpha = 0.5f)
+                        } else Color.White
+                    )
                     .fillMaxHeight()
                     .clickable {
                         viewModel.changeScreen(Screen.POPULAR)
@@ -197,6 +184,11 @@ fun BottomBar(viewModel: ExchangeViewModel) {
             )
             Box(
                 modifier = Modifier
+                    .background(
+                        color = if (state.activeScreen == Screen.FAVORITE) {
+                            Color.Blue.copy(alpha = 0.5f)
+                        } else Color.White
+                    )
                     .fillMaxHeight()
                     .clickable {
                         viewModel.changeScreen(Screen.FAVORITE)

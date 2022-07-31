@@ -29,7 +29,7 @@ class ExchangeRepository(
         }
     }
 
-    fun getCurrencyRates(base: String): Flow<List<CurrencyRatesModel>> {
+    fun getCurrencyRates(base: String? = null): Flow<List<CurrencyRatesModel>> {
         return currenciesDao.getCurrencyRates(base)
     }
 
