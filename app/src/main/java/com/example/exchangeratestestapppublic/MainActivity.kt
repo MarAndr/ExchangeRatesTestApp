@@ -32,36 +32,37 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val state = viewModel.state.collectAsState().value
-            viewModel.getCurrencyNamesList()
-            val currencyNames =
-                viewModel.currencyNames.collectAsState().value.symbols?.map { (currency: String, currencyFullName: String) ->
-                    "$currencyFullName ($currency)"
-                }
-            val mainScreenState = viewModel.mainScreen.collectAsState().value
-
-
-            val currencyRates = state.rates?.map { (currencyName: String, rate: Double) ->
-                rate
-            }
-            Scaffold(
-                topBar = {
-                    if (currencyNames != null) {
-                        TopBar(currencyNames)
-                    }
-                },
-                bottomBar = {
-                    BottomBar(viewModel = viewModel)
-                }
-            ) {
-                when (mainScreenState.activeScreen) {
-                    Screen.POPULAR -> MainScreen(
-                        currencyNames = currencyNames,
-                        currencyRates = currencyRates
-                    )
-                    Screen.FAVORITE -> Text(text = "Favorite")
-                }
-            }
+            
+//            val state = viewModel.state.collectAsState().value
+//            viewModel.getCurrencyNamesList()
+//            val currencyNames =
+//                viewModel.currencyNames.collectAsState().value.symbols?.map { (currency: String, currencyFullName: String) ->
+//                    "$currencyFullName ($currency)"
+//                }
+//            val mainScreenState = viewModel.mainScreen.collectAsState().value
+//
+//
+//            val currencyRates = state.rates?.map { (currencyName: String, rate: Double) ->
+//                rate
+//            }
+//            Scaffold(
+//                topBar = {
+//                    if (currencyNames != null) {
+//                        TopBar(currencyNames)
+//                    }
+//                },
+//                bottomBar = {
+//                    BottomBar(viewModel = viewModel)
+//                }
+//            ) {
+//                when (mainScreenState.activeScreen) {
+//                    Screen.POPULAR -> MainScreen(
+//                        currencyNames = currencyNames,
+//                        currencyRates = currencyRates
+//                    )
+//                    Screen.FAVORITE -> Text(text = "Favorite")
+//                }
+//            }
         }
     }
 }

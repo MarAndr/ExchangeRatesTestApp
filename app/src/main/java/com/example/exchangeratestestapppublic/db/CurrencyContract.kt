@@ -1,12 +1,21 @@
 package com.example.exchangeratestestapppublic.db
 
 object CurrencyContract {
-    const val TABLE_NAME = "currency_table"
+    const val CURRENCY_RATES_TABLE_NAME = "CurrencyRatesModel"
 
-    object Column {
+    object CurrencyRatesColumn {
         const val ID = "id"
-        const val TITLE = "title"
-        const val IS_DONE = "isDone"
-        const val SECTION_ID = "section_id"
+        const val TIMESTAMP = "timestamp"
+        const val BASE = "base"
+        const val QUOTE = "quote"
+        const val RATE = "rate"
+    }
+
+    object CurrenciesColumn {
+        const val ID = "id"
+        const val TIMESTAMP = "timestamp"
+        const val BASE = "base"
+        const val QUOTE = "quote"
+        const val RATE = "rate"
     }
 }

@@ -3,10 +3,13 @@ package com.example.exchangeratestestapppublic.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
-@Database(entities = [], version = CurrencyDatabase.DB_VERSION)
+@Database(
+    entities = [CurrencyRatesModel::class, CurrenciesModel::class],
+    version = CurrencyDatabase.DB_VERSION
+)
 abstract class CurrencyDatabase : RoomDatabase() {
 
-//    abstract fun currencyDao(): CurrencyDao
+    abstract fun currencyRatesDao(): CurrencyRatesDao
 
     companion object {
         const val DB_NAME = "currencyDatabase"

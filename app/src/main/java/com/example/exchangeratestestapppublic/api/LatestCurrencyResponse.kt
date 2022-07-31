@@ -1,18 +1,13 @@
-package com.example.exchangeratestestapppublic
+package com.example.exchangeratestestapppublic.api
 
 import java.util.*
 
-
 data class LatestCurrencyResponse(
+    val id: Long = 0,
     val success: Boolean? = null,
     val timestamp: Long? = null,
     val base: String? = null,
     val date: Date? = null,
     val rates: Map<String, Double>? = null
-)
-
-data class CurrencyName(
-    val success: Boolean? = null,
-    val symbols: Map<String, String>? = null
 )
 

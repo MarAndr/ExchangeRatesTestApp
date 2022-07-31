@@ -1,4 +1,4 @@
-package com.example.exchangeratestestapppublic
+package com.example.exchangeratestestapppublic.api
 
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -18,7 +18,7 @@ interface ExchangeApi {
     ): LatestCurrencyResponse
 
     @GET("exchangerates_data/symbols")
-    suspend fun getCurrencyNamesList(): CurrencyName
+    suspend fun getCurrencyNamesList(): CurrenciesNameResponse
 
 
     companion object {
