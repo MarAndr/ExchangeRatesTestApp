@@ -11,10 +11,10 @@ import retrofit2.http.Query
 
 interface ExchangeApi {
 
-    //    @GET("exchangerates_data/latest?symbols={GBP,JPY,EUR}")
     @GET("exchangerates_data/latest")
     suspend fun getLatestCurrency(
-        @Query("base") base: String
+        @Query("base") base: String,
+        @Query("symbols") symbols: String
     ): LatestCurrencyResponse
 
     @GET("exchangerates_data/symbols")

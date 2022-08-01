@@ -10,7 +10,7 @@ import com.example.exchangeratestestapppublic.ui.ExchangeView
 import com.example.exchangeratestestapppublic.ui.theme.ExchangeRatesTestAppPublicTheme
 
 
-data class MainScreenState(
+data class PopularScreenState(
     val activeScreen: Screen = Screen.POPULAR,
     val currencyNames: List<String> = emptyList()
 )

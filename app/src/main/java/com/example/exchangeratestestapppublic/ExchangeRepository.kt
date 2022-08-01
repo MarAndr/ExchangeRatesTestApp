@@ -1,5 +1,6 @@
 package com.example.exchangeratestestapppublic
 
+import android.util.Log
 import com.example.exchangeratestestapppublic.api.CurrenciesNameResponse
 import com.example.exchangeratestestapppublic.api.ExchangeApi
 import com.example.exchangeratestestapppublic.db.CurrencyRatesDao
@@ -12,7 +13,11 @@ class ExchangeRepository(
 ) {
 
     suspend fun fetchLatestCurrency(base: String) {
-        val response = retrofit.getLatestCurrency(base = base)
+        Log.d("MY_TAG", "symbols = ${Symbols.getSymbolsString()}")
+        val response = retrofit.getLatestCurrency(
+            base = base,
+            symbols = Symbols.getSymbolsString()
+        )
         if (response.success != false) {
             response.rates?.let {
                 it.forEach { (quote, rate) ->
@@ -35,5 +40,30 @@ class ExchangeRepository(
 
     suspend fun getCurrencyNamesList(): CurrenciesNameResponse {
         return retrofit.getCurrencyNamesList()
+    }
+}
+
+enum class Symbols {
+    USD,
+    EUR,
+    GBP,
+    CNY,
+    CHF,
+    JPY,
+    UAH,
+    RUB,
+    SEK,
+    TRY,
+    SGD,
+    CAD,
+    DKK,
+    KRW,
+    BRL,
+    INR,
+    PLN,
+    AMD;
+
+    companion object {
+        fun getSymbolsString() = values().joinToString(",")
     }
 }

@@ -13,8 +13,8 @@ class ExchangeViewModel : ViewModel() {
 
     private val repo =
         ExchangeRepository(ExchangeApi.getApi(), Database.instance.currencyRatesDao())
-    private val _mainScreen = MutableStateFlow(MainScreenState())
-    val mainScreen: StateFlow<MainScreenState> = _mainScreen
+    private val _mainScreen = MutableStateFlow(PopularScreenState())
+    val mainScreen: StateFlow<PopularScreenState> = _mainScreen
 
     fun getCurrencyRates(base: String?): Flow<List<CurrencyRatesModel>> =
         repo.getCurrencyRates(base ?: "")
@@ -28,7 +28,7 @@ class ExchangeViewModel : ViewModel() {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), initialValue = emptyList())
 
-    private var mainScreenStateValue: MainScreenState
+    private var mainScreenStateValue: PopularScreenState
         get() = _mainScreen.value
         set(value) {
             _mainScreen.value = value
