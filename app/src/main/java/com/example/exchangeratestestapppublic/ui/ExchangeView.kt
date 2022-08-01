@@ -21,11 +21,13 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
     val currencyRates by viewModel.getCurrencyRates(
         base = "USD"
     ).collectAsState(initial = emptyList())
-    val quotes by viewModel.quotes(chosenCurrency).collectAsState()
-
+//    val currenciesList by viewModel.currenciesList().collectAsState()
+//    Log.d("MY_TAG", "currenciesList = $currenciesList")
+//    val quotes by viewModel.quotes(chosenCurrency).collectAsState()
+    val currenciesList by viewModel.currenciesList.collectAsState()
     Scaffold(
         topBar = {
-            TopBar(quotes) {
+            TopBar(currenciesList) {
                 chosenCurrency = it
             }
         },

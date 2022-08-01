@@ -1,8 +1,9 @@
 package com.example.exchangeratestestapppublic
 
 import android.util.Log
-import com.example.exchangeratestestapppublic.api.CurrenciesNameResponse
 import com.example.exchangeratestestapppublic.api.ExchangeApi
+import com.example.exchangeratestestapppublic.db.CurrenciesListDao
+import com.example.exchangeratestestapppublic.db.CurrenciesModel
 import com.example.exchangeratestestapppublic.db.CurrencyRatesDao
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 import kotlinx.coroutines.flow.Flow
@@ -10,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 class ExchangeRepository(
     private val retrofit: ExchangeApi,
     private val currenciesDao: CurrencyRatesDao,
+    private val currenciesListDao: CurrenciesListDao
 ) {
 
     suspend fun fetchLatestCurrency(base: String) {
-        Log.d("MY_TAG", "symbols = ${Symbols.getSymbolsString()}")
         val response = retrofit.getLatestCurrency(
             base = base,
             symbols = Symbols.getSymbolsString()
@@ -26,7 +27,7 @@ class ExchangeRepository(
                         base = base,
                         quote = quote,
                         rate = rate,
-                        isQuoteFavorite = currenciesDao.getFavoriteField(quote)
+                        isQuoteFavorite = currenciesDao.getFavoriteField(quote) ?: false
                     )
 
                     currenciesDao.addCurrencyRates(currencyRatesModel = currencyRateModel)
@@ -39,8 +40,25 @@ class ExchangeRepository(
         return currenciesDao.getCurrencyRates(base)
     }
 
-    suspend fun getCurrencyNamesList(): CurrenciesNameResponse {
-        return retrofit.getCurrencyNamesList()
+//    fun getCurrenciesList(): Flow<List<CurrenciesModel>> {
+//        return currenciesListDao.getCurrencies()
+//    }
+
+    suspend fun fetchCurrencyNamesList() {
+        if (currenciesListDao.getCurrenciesList().isEmpty()) {
+            Log.d("MY_TAG", "fetchCurrencyNamesList:")
+            val response = retrofit.getCurrencyNamesList()
+            if (response.success != false) {
+                response.symbols?.let {
+                    it.forEach { (symbol, name) ->
+                        val currencyNamesList =
+                            CurrenciesModel(id = 0, symbol = symbol, name = name)
+                        currenciesListDao.addCurrenciesList(currencyNamesList)
+                    }
+
+                }
+            }
+        }
     }
 }
 

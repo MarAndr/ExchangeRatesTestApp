@@ -35,8 +35,6 @@ data class CurrenciesModel(
     @ColumnInfo(name = CurrencyNamesContract.Column.SYMBOL)
     val symbol: String,
     @ColumnInfo(name = CurrencyNamesContract.Column.NAME)
-    val name: String,
-    @ColumnInfo(name = CurrencyNamesContract.Column.IS_FAVORITE)
-    val isFavorite: Boolean = false
+    val name: String
 )
 

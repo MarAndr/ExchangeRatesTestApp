@@ -10,6 +10,7 @@ import androidx.room.RoomDatabase
 abstract class CurrencyDatabase : RoomDatabase() {
 
     abstract fun currencyRatesDao(): CurrencyRatesDao
+    abstract fun currenciesListDao(): CurrenciesListDao
 
     companion object {
         const val DB_NAME = "currencyDatabase"

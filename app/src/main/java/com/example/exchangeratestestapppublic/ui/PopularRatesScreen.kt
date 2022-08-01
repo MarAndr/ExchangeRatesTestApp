@@ -15,7 +15,10 @@ import com.example.exchangeratestestapppublic.R
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 
 @Composable
-fun PopularRatesScreen(currencyRates: List<CurrencyRatesModel>, viewModel: ExchangeViewModel) {
+fun PopularRatesScreen(
+    currencyRates: List<CurrencyRatesModel>,
+    viewModel: ExchangeViewModel
+) {
 
 
     Column(Modifier.padding(16.dp)) {
