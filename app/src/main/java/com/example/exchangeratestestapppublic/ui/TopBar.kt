@@ -102,17 +102,18 @@ fun SortingDialog(onDismissRequest: () -> Unit) {
                     text = "Отсортировать названия валют по возрастанию",
                     style = MaterialTheme.typography.h5
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Divider(Modifier.padding(vertical = 8.dp))
                 Text(
                     text = "Отсортировать названия валют по убыванию",
                     style = MaterialTheme.typography.h5
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+
+                Divider(Modifier.padding(vertical = 8.dp))
                 Text(
                     text = "Отсортировать значения валют по возрастанию",
                     style = MaterialTheme.typography.h5
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Divider(Modifier.padding(vertical = 8.dp))
                 Text(
                     text = "Отсортировать значения валют по убыванию",
                     style = MaterialTheme.typography.h5
