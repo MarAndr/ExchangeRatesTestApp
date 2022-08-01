@@ -4,21 +4,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.ExchangeViewModel
+import com.example.exchangeratestestapppublic.Ordering
 import com.example.exchangeratestestapppublic.Screen
 
 @Composable
 fun ExchangeView(viewModel: ExchangeViewModel) {
-    var chosenCurrency: String? by remember {
-        mutableStateOf(null)
-    }
+//    var chosenCurrency: String? by remember {
+//        mutableStateOf(null)
+//    }
     val mainScreenState = viewModel.mainScreen.collectAsState().value
 
     val currencyRates by viewModel.getCurrencyRates(
-        base = "USD"
+        base = mainScreenState.chosenCurrency
     ).collectAsState(initial = emptyList())
 
     val currencyRatesSortedByAscQuote by viewModel.getCurrencyRatesSortedByAscQuote(
@@ -48,11 +51,11 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
         topBar = {
             TopBar(
                 currenciesList,
-                onClick = { chosenCurrency = it },
-                onSortDescRateClick = {},
-                onSortAscRateClick = {},
-                onSortAscQuoteClick = {},
-                onSortDescQuoteClick = {})
+                onClick = { viewModel.changeChosenCurrency(it) },
+                onSortDescRateClick = { viewModel.changeOrder(Ordering.RATE_DESC) },
+                onSortAscRateClick = { viewModel.changeOrder(Ordering.RATE_ASC) },
+                onSortAscQuoteClick = { viewModel.changeOrder(Ordering.QUOTE_ASC) },
+                onSortDescQuoteClick = { viewModel.changeOrder(Ordering.QUOTE_DESC) })
         },
         bottomBar = {
             BottomBar(viewModel = viewModel, state = mainScreenState)

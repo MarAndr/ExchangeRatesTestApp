@@ -2,10 +2,7 @@ package com.example.exchangeratestestapppublic
 
 import android.util.Log
 import com.example.exchangeratestestapppublic.api.ExchangeApi
-import com.example.exchangeratestestapppublic.db.CurrenciesListDao
-import com.example.exchangeratestestapppublic.db.CurrenciesModel
-import com.example.exchangeratestestapppublic.db.CurrencyRatesDao
-import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
+import com.example.exchangeratestestapppublic.db.*
 import kotlinx.coroutines.flow.Flow
 
 class ExchangeRepository(
@@ -38,6 +35,27 @@ class ExchangeRepository(
 
     fun getCurrencyRates(base: String? = null): Flow<List<CurrencyRatesModel>> {
         return currenciesDao.getCurrencyRates(base)
+    }
+
+    fun getCurrencyRatesSorted(base: String, ordering: Ordering): Flow<List<CurrencyRatesModel>> {
+        return when (ordering) {
+            Ordering.QUOTE_ASC -> currenciesDao.getCurrencyRatesSorted(
+                base,
+                "${CurrencyRatesContract.CurrencyRatesColumn.QUOTE} ASC"
+            )
+            Ordering.QUOTE_DESC -> currenciesDao.getCurrencyRatesSorted(
+                base,
+                "${CurrencyRatesContract.CurrencyRatesColumn.QUOTE} DESC"
+            )
+            Ordering.RATE_ASC -> currenciesDao.getCurrencyRatesSorted(
+                base,
+                "${CurrencyRatesContract.CurrencyRatesColumn.RATE} ASC"
+            )
+            Ordering.RATE_DESC -> currenciesDao.getCurrencyRatesSorted(
+                base,
+                "${CurrencyRatesContract.CurrencyRatesColumn.RATE} DESC"
+            )
+        }
     }
 
     fun getCurrencyRatesSortedByAscQuote(base: String): Flow<List<CurrencyRatesModel>> {
