@@ -15,14 +15,32 @@ import com.example.exchangeratestestapppublic.R
 
 
 @Composable
-fun TopBar(items: List<String>, onClick: (String) -> Unit) {
+fun TopBar(
+    items: List<String>, onClick: (String) -> Unit,
+    onSortAscQuoteClick: () -> Unit,
+    onSortDescQuoteClick: () -> Unit,
+    onSortAscRateClick: () -> Unit,
+    onSortDescRateClick: () -> Unit
+) {
     Surface(elevation = 8.dp, modifier = Modifier.height(75.dp)) {
-        DropdownMenu(items, onClick)
+        DropdownMenu(
+            items = items,
+            onClick = onClick,
+            onSortAscQuoteClick,
+            onSortDescQuoteClick,
+            onSortAscRateClick,
+            onSortDescRateClick
+        )
     }
 }
 
 @Composable
-fun DropdownMenu(items: List<String>, onClick: (String) -> Unit) {
+fun DropdownMenu(
+    items: List<String>, onClick: (String) -> Unit, onSortAscQuoteClick: () -> Unit,
+    onSortDescQuoteClick: () -> Unit,
+    onSortAscRateClick: () -> Unit,
+    onSortDescRateClick: () -> Unit
+) {
     var isSortingDialog by remember {
         mutableStateOf(false)
     }
@@ -47,7 +65,7 @@ fun DropdownMenu(items: List<String>, onClick: (String) -> Unit) {
                 Text(text = "Choose a currency", style = MaterialTheme.typography.h5)
             }
 
-            androidx.compose.material.DropdownMenu(
+            DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
@@ -87,34 +105,48 @@ fun DropdownMenu(items: List<String>, onClick: (String) -> Unit) {
     }
 
     if (isSortingDialog) {
-        SortingDialog {
-            isSortingDialog = false
-        }
+        SortingDialog(
+            onDismissRequest = { isSortingDialog = false },
+            onSortAscQuoteClick = { onSortAscQuoteClick() },
+            onSortDescQuoteClick = { onSortDescQuoteClick() },
+            onSortAscRateClick = { onSortAscRateClick() },
+            onSortDescRateClick = { onSortDescRateClick() },
+        )
     }
 }
 
 @Composable
-fun SortingDialog(onDismissRequest: () -> Unit) {
+fun SortingDialog(
+    onDismissRequest: () -> Unit,
+    onSortAscQuoteClick: () -> Unit,
+    onSortDescQuoteClick: () -> Unit,
+    onSortAscRateClick: () -> Unit,
+    onSortDescRateClick: () -> Unit
+) {
     Dialog(onDismissRequest = onDismissRequest) {
         Card {
             Column(Modifier.padding(16.dp)) {
                 Text(
+                    modifier = Modifier.clickable { onSortAscQuoteClick() },
                     text = "Отсортировать названия валют по возрастанию",
                     style = MaterialTheme.typography.h5
                 )
                 Divider(Modifier.padding(vertical = 8.dp))
                 Text(
+                    modifier = Modifier.clickable { onSortDescQuoteClick() },
                     text = "Отсортировать названия валют по убыванию",
                     style = MaterialTheme.typography.h5
                 )
 
                 Divider(Modifier.padding(vertical = 8.dp))
                 Text(
+                    modifier = Modifier.clickable { onSortAscRateClick() },
                     text = "Отсортировать значения валют по возрастанию",
                     style = MaterialTheme.typography.h5
                 )
                 Divider(Modifier.padding(vertical = 8.dp))
                 Text(
+                    modifier = Modifier.clickable { onSortDescRateClick() },
                     text = "Отсортировать значения валют по убыванию",
                     style = MaterialTheme.typography.h5
                 )

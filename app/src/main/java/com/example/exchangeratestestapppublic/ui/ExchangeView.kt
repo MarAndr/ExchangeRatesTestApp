@@ -21,6 +21,22 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
         base = "USD"
     ).collectAsState(initial = emptyList())
 
+    val currencyRatesSortedByAscQuote by viewModel.getCurrencyRatesSortedByAscQuote(
+        base = "USD"
+    ).collectAsState(initial = emptyList())
+
+    val currencyRatesSortedByDescQuote by viewModel.getCurrencyRatesSortedByDescQuote(
+        base = "USD"
+    ).collectAsState(initial = emptyList())
+
+    val currencyRatesSortedByAscRate by viewModel.getCurrencyRatesSortedByAscRate(
+        base = "USD"
+    ).collectAsState(initial = emptyList())
+
+    val currencyRatesSortedByDescRate by viewModel.getCurrencyRatesSortedByDescRate(
+        base = "USD"
+    ).collectAsState(initial = emptyList())
+
     val favoriteCurrencyRates by viewModel.getFavoriteCurrencyRates(
         base = "USD"
     ).collectAsState(initial = emptyList())
@@ -30,9 +46,13 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
     val currenciesList by viewModel.currenciesList.collectAsState()
     Scaffold(
         topBar = {
-            TopBar(currenciesList) {
-                chosenCurrency = it
-            }
+            TopBar(
+                currenciesList,
+                onClick = { chosenCurrency = it },
+                onSortDescRateClick = {},
+                onSortAscRateClick = {},
+                onSortAscQuoteClick = {},
+                onSortDescQuoteClick = {})
         },
         bottomBar = {
             BottomBar(viewModel = viewModel, state = mainScreenState)

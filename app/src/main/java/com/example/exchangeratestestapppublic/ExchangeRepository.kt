@@ -40,6 +40,22 @@ class ExchangeRepository(
         return currenciesDao.getCurrencyRates(base)
     }
 
+    fun getCurrencyRatesSortedByAscQuote(base: String): Flow<List<CurrencyRatesModel>> {
+        return currenciesDao.getCurrencyRatesSortedByAscQuote(base)
+    }
+
+    fun getCurrencyRatesSortedByDescQuote(base: String): Flow<List<CurrencyRatesModel>> {
+        return currenciesDao.getCurrencyRatesSortedByDescQuote(base)
+    }
+
+    fun getCurrencyRatesSortedByAscRate(base: String): Flow<List<CurrencyRatesModel>> {
+        return currenciesDao.getCurrencyRatesSortedByAscRate(base)
+    }
+
+    fun getCurrencyRatesSortedByDescRate(base: String): Flow<List<CurrencyRatesModel>> {
+        return currenciesDao.getCurrencyRatesSortedByDescRate(base)
+    }
+
     fun getFavoriteCurrencyRates(base: String? = null): Flow<List<CurrencyRatesModel>> {
         return currenciesDao.getFavoriteCurrencyRates(base)
     }
