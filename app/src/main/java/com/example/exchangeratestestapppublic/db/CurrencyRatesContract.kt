@@ -9,5 +9,6 @@ object CurrencyRatesContract {
         const val BASE = "base"
         const val QUOTE = "quote"
         const val RATE = "rate"
+        const val IS_QUOTE_FAVORITE = "is_quote_favorite"
     }
 }

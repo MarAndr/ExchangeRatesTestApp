@@ -41,6 +41,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
         ) {
             when (mainScreenState.activeScreen) {
                 Screen.POPULAR -> PopularRatesScreen(
+                    viewModel = viewModel,
                     currencyRates = currencyRates
                 )
                 Screen.FAVORITE -> Text(text = "Favorite")

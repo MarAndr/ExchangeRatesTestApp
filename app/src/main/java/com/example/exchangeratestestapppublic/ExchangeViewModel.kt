@@ -11,8 +11,10 @@ import kotlinx.coroutines.launch
 
 class ExchangeViewModel : ViewModel() {
 
+    val dao = Database.instance.currencyRatesDao()
+
     private val repo =
-        ExchangeRepository(ExchangeApi.getApi(), Database.instance.currencyRatesDao())
+        ExchangeRepository(ExchangeApi.getApi(), dao)
     private val _mainScreen = MutableStateFlow(PopularScreenState())
     val mainScreen: StateFlow<PopularScreenState> = _mainScreen
 
@@ -33,6 +35,12 @@ class ExchangeViewModel : ViewModel() {
         set(value) {
             _mainScreen.value = value
         }
+
+    fun changeQuoteFavorite(isFavorite: Boolean, quote: String) {
+        viewModelScope.launch {
+            dao.changeFavoriteField(isFavorite, quote)
+        }
+    }
 
     init {
         viewModelScope.launch(Dispatchers.IO) {

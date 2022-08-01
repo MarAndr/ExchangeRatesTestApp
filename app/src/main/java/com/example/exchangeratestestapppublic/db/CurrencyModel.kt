@@ -22,7 +22,9 @@ data class CurrencyRatesModel(
     @ColumnInfo(name = CurrencyRatesContract.CurrencyRatesColumn.QUOTE)
     val quote: String,
     @ColumnInfo(name = CurrencyRatesContract.CurrencyRatesColumn.RATE)
-    val rate: Double
+    val rate: Double,
+    @ColumnInfo(name = CurrencyRatesContract.CurrencyRatesColumn.IS_QUOTE_FAVORITE)
+    val isQuoteFavorite: Boolean = false
 )
 
 @Entity(tableName = CurrencyNamesContract.CURRENCIES_TABLE_NAME)

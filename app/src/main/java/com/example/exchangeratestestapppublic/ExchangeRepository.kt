@@ -25,7 +25,8 @@ class ExchangeRepository(
                         timestamp = response.timestamp ?: 0,
                         base = base,
                         quote = quote,
-                        rate = rate
+                        rate = rate,
+                        isQuoteFavorite = currenciesDao.getFavoriteField(quote)
                     )
 
                     currenciesDao.addCurrencyRates(currencyRatesModel = currencyRateModel)
