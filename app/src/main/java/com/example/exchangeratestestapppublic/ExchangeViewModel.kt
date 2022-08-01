@@ -17,7 +17,7 @@ class ExchangeViewModel : ViewModel() {
     val mainScreen: StateFlow<PopularScreenState> = _mainScreen
 
     fun getCurrencyRates(base: String?): Flow<List<CurrencyRatesModel>> =
-        repo.getCurrencyRates(base ?: "")
+        repo.getCurrencyRates(base)
 
     fun quotes(base: String?): StateFlow<List<String>> = flow {
         repo.getCurrencyRates(base).collect { currency ->

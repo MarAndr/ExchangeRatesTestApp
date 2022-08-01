@@ -1,8 +1,13 @@
 package com.example.exchangeratestestapppublic.ui
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.ExchangeViewModel
 import com.example.exchangeratestestapppublic.Screen
 
@@ -16,7 +21,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
     val currencyRates by viewModel.getCurrencyRates(
         base = "USD"
     ).collectAsState(initial = emptyList())
-    val quotes by viewModel.quotes("USD").collectAsState()
+    val quotes by viewModel.quotes(chosenCurrency).collectAsState()
 
     Scaffold(
         topBar = {
@@ -28,12 +33,19 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
             BottomBar(viewModel = viewModel, state = mainScreenState)
         }
     ) {
-        when (mainScreenState.activeScreen) {
-            Screen.POPULAR -> PopularRatesScreen(
-                currencyNames = quotes,
-                currencyRates = emptyList()
-            )
-            Screen.FAVORITE -> Text(text = "Favorite")
+        Card(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            elevation = 4.dp
+        ) {
+            when (mainScreenState.activeScreen) {
+                Screen.POPULAR -> PopularRatesScreen(
+                    currencyRates = currencyRates
+                )
+                Screen.FAVORITE -> Text(text = "Favorite")
+            }
         }
+
     }
 }
