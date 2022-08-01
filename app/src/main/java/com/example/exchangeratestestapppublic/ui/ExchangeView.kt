@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,6 +18,10 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
     val mainScreenState = viewModel.mainScreen.collectAsState().value
 
     val currencyRates by viewModel.getCurrencyRates(
+        base = "USD"
+    ).collectAsState(initial = emptyList())
+
+    val favoriteCurrencyRates by viewModel.getFavoriteCurrencyRates(
         base = "USD"
     ).collectAsState(initial = emptyList())
 //    val currenciesList by viewModel.currenciesList().collectAsState()
@@ -46,7 +49,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
                     viewModel = viewModel,
                     currencyRates = currencyRates
                 )
-                Screen.FAVORITE -> Text(text = "Favorite")
+                Screen.FAVORITE -> FavoriteRatesScreen(favoriteCurrencyRates = favoriteCurrencyRates)
             }
         }
 

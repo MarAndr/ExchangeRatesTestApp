@@ -40,6 +40,10 @@ class ExchangeRepository(
         return currenciesDao.getCurrencyRates(base)
     }
 
+    fun getFavoriteCurrencyRates(base: String? = null): Flow<List<CurrencyRatesModel>> {
+        return currenciesDao.getFavoriteCurrencyRates(base)
+    }
+
 //    fun getCurrenciesList(): Flow<List<CurrenciesModel>> {
 //        return currenciesListDao.getCurrencies()
 //    }

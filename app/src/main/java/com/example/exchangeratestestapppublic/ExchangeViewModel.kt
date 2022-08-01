@@ -28,6 +28,9 @@ class ExchangeViewModel : ViewModel() {
     fun getCurrencyRates(base: String?): Flow<List<CurrencyRatesModel>> =
         repo.getCurrencyRates(base)
 
+    fun getFavoriteCurrencyRates(base: String?): Flow<List<CurrencyRatesModel>> =
+        repo.getFavoriteCurrencyRates(base)
+
 //    fun getCurrenciesList(): Flow<List<CurrenciesModel>> = repo.getCurrenciesList()
 
     fun getCurrenciesList() {
