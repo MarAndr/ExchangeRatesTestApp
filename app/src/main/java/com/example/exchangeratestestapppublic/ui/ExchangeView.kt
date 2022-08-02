@@ -15,38 +15,17 @@ import com.example.exchangeratestestapppublic.Screen
 
 @Composable
 fun ExchangeView(viewModel: ExchangeViewModel) {
-//    var chosenCurrency: String? by remember {
-//        mutableStateOf(null)
-//    }
+
     val mainScreenState = viewModel.mainScreen.collectAsState().value
 
     val currencyRates by viewModel.getCurrencyRates(
         base = mainScreenState.chosenCurrency
     ).collectAsState(initial = emptyList())
 
-    val currencyRatesSortedByAscQuote by viewModel.getCurrencyRatesSortedByAscQuote(
-        base = "USD"
-    ).collectAsState(initial = emptyList())
-
-    val currencyRatesSortedByDescQuote by viewModel.getCurrencyRatesSortedByDescQuote(
-        base = "USD"
-    ).collectAsState(initial = emptyList())
-
-    val currencyRatesSortedByAscRate by viewModel.getCurrencyRatesSortedByAscRate(
-        base = "USD"
-    ).collectAsState(initial = emptyList())
-
-    val currencyRatesSortedByDescRate by viewModel.getCurrencyRatesSortedByDescRate(
-        base = "USD"
-    ).collectAsState(initial = emptyList())
-
     val favoriteCurrencyRates by viewModel.getFavoriteCurrencyRates(
         base = "USD"
     ).collectAsState(initial = emptyList())
-//    val currenciesList by viewModel.currenciesList().collectAsState()
-//    Log.d("MY_TAG", "currenciesList = $currenciesList")
-//    val quotes by viewModel.quotes(chosenCurrency).collectAsState()
-    val currenciesList by viewModel.currenciesList.collectAsState()
+
     Scaffold(
         topBar = {
             TopBar(

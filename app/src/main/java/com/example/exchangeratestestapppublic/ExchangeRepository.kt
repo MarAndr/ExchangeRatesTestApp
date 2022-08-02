@@ -1,6 +1,5 @@
 package com.example.exchangeratestestapppublic
 
-import android.util.Log
 import com.example.exchangeratestestapppublic.api.ExchangeApi
 import com.example.exchangeratestestapppublic.db.*
 import kotlinx.coroutines.flow.Flow
@@ -58,22 +57,6 @@ class ExchangeRepository(
         }
     }
 
-    fun getCurrencyRatesSortedByAscQuote(base: String): Flow<List<CurrencyRatesModel>> {
-        return currenciesDao.getCurrencyRatesSortedByAscQuote(base)
-    }
-
-    fun getCurrencyRatesSortedByDescQuote(base: String): Flow<List<CurrencyRatesModel>> {
-        return currenciesDao.getCurrencyRatesSortedByDescQuote(base)
-    }
-
-    fun getCurrencyRatesSortedByAscRate(base: String): Flow<List<CurrencyRatesModel>> {
-        return currenciesDao.getCurrencyRatesSortedByAscRate(base)
-    }
-
-    fun getCurrencyRatesSortedByDescRate(base: String): Flow<List<CurrencyRatesModel>> {
-        return currenciesDao.getCurrencyRatesSortedByDescRate(base)
-    }
-
     fun getFavoriteCurrencyRates(base: String? = null): Flow<List<CurrencyRatesModel>> {
         return currenciesDao.getFavoriteCurrencyRates(base)
     }
@@ -84,7 +67,6 @@ class ExchangeRepository(
 
     suspend fun fetchCurrencyNamesList() {
         if (currenciesListDao.getCurrenciesList().isEmpty()) {
-            Log.d("MY_TAG", "fetchCurrencyNamesList:")
             val response = retrofit.getCurrencyNamesList()
             if (response.success != false) {
                 response.symbols?.let {
