@@ -23,11 +23,20 @@ interface CurrencyRatesDao {
     @Query("select ${CurrencyRatesContract.CurrencyRatesColumn.IS_QUOTE_FAVORITE} from ${CurrencyRatesContract.CURRENCY_RATES_TABLE_NAME} where ${CurrencyRatesContract.CurrencyRatesColumn.QUOTE} = :quote")
     suspend fun getFavoriteField(quote: String): Boolean?
 
-    @Query("select * from ${CurrencyRatesContract.CURRENCY_RATES_TABLE_NAME} where ${CurrencyRatesContract.CurrencyRatesColumn.BASE} = :base and ${CurrencyRatesContract.CurrencyRatesColumn.IS_QUOTE_FAVORITE} = 1")
-    fun getFavoriteCurrencyRates(base: String?): Flow<List<CurrencyRatesModel>>
+    @Query("select * from ${CurrencyRatesContract.CURRENCY_RATES_TABLE_NAME} where ${CurrencyRatesContract.CurrencyRatesColumn.BASE} = :base and ${CurrencyRatesContract.CurrencyRatesColumn.IS_QUOTE_FAVORITE} = 1 ORDER BY CASE WHEN :isAsc = 1 THEN quote END ASC, CASE WHEN :isAsc = 0 THEN quote END DESC")
+    fun getFavoriteCurrencyRatesByQuote(
+        base: String,
+        isAsc: Boolean
+    ): Flow<List<CurrencyRatesModel>>
+
+    @Query("select * from ${CurrencyRatesContract.CURRENCY_RATES_TABLE_NAME} where ${CurrencyRatesContract.CurrencyRatesColumn.BASE} = :base and ${CurrencyRatesContract.CurrencyRatesColumn.IS_QUOTE_FAVORITE} = 1 ORDER BY CASE WHEN :isAsc = 1 THEN rate END ASC, CASE WHEN :isAsc = 0 THEN rate END DESC")
+    fun getFavoriteCurrencyRatesByRates(
+        base: String,
+        isAsc: Boolean
+    ): Flow<List<CurrencyRatesModel>>
 
     @Query("SELECT * FROM ${CurrencyRatesContract.CURRENCY_RATES_TABLE_NAME} where ${CurrencyRatesContract.CurrencyRatesColumn.BASE} = :base ORDER BY CASE WHEN :isAsc = 1 THEN quote END ASC, CASE WHEN :isAsc = 0 THEN quote END DESC")
-    fun getCurrencyRatesOrderByQuote(base: String,isAsc: Boolean): Flow<List<CurrencyRatesModel>>
+    fun getCurrencyRatesOrderByQuote(base: String, isAsc: Boolean): Flow<List<CurrencyRatesModel>>
 
     @Query("SELECT * FROM ${CurrencyRatesContract.CURRENCY_RATES_TABLE_NAME} where ${CurrencyRatesContract.CurrencyRatesColumn.BASE} = :base ORDER BY CASE WHEN :isAsc = 1 THEN rate END ASC, CASE WHEN :isAsc = 0 THEN rate END DESC")
     fun getCurrencyRatesOrderByRate(base: String, isAsc: Boolean): Flow<List<CurrencyRatesModel>>

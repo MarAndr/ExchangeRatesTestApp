@@ -2,13 +2,13 @@ package com.example.exchangeratestestapppublic
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.exchangeratestestapppublic.api.ExchangeApi
 import com.example.exchangeratestestapppublic.db.CurrenciesModel
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
-import com.example.exchangeratestestapppublic.db.Database
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class MainScreenState(
     val activeScreen: Screen = Screen.POPULAR,
@@ -16,24 +16,16 @@ data class MainScreenState(
     val currencyRates: List<CurrencyRatesModel> = emptyList(),
     val currenciesList: List<CurrenciesModel> = emptyList(),
     val ordering: Ordering = Ordering.QUOTE_ASC,
+    val favoritesRates: List<CurrencyRatesModel> = emptyList()
 )
 
-class ExchangeViewModel : ViewModel() {
+@HiltViewModel
+class ExchangeViewModel @Inject constructor(
+    private val repo: ExchangeRepository
+) : ViewModel() {
 
-    private val currencyRatesDao = Database.instance.currencyRatesDao()
-    private val currenciesListDao = Database.instance.currenciesListDao()
-
-    private val repo = ExchangeRepository(
-        retrofit = ExchangeApi.getApi(),
-        currenciesDao = currencyRatesDao,
-        currenciesListDao = currenciesListDao
-    )
     private val _mainScreen = MutableStateFlow(MainScreenState())
     val mainScreen: StateFlow<MainScreenState> = _mainScreen
-
-    fun getFavoriteCurrencyRates(base: String?): Flow<List<CurrencyRatesModel>> =
-        repo.getFavoriteCurrencyRates(base)
-
 
     private var mainScreenStateValue: MainScreenState
         get() = _mainScreen.value
@@ -45,8 +37,8 @@ class ExchangeViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 getRates()
+                getCurrencyNames()
                 repo.fetchCurrencyNamesList()
-                subscribeCurrencyNames()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -55,34 +47,39 @@ class ExchangeViewModel : ViewModel() {
 
     fun changeQuoteFavorite(isFavorite: Boolean, quote: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            currencyRatesDao.changeFavoriteField(isFavorite, quote)
-            getRates()
+            repo.changeFavoriteField(isFavorite, quote)
         }
     }
 
     fun changeOrder(ordering: Ordering) {
         viewModelScope.launch(Dispatchers.IO) {
             mainScreenStateValue = mainScreenStateValue.copy(ordering = ordering)
-            getRates()
+            when (mainScreenStateValue.activeScreen) {
+                Screen.POPULAR -> getRates()
+                Screen.FAVORITE -> getFavoriteRates()
+            }
         }
     }
 
     fun changeScreen(screen: Screen) {
         viewModelScope.launch(Dispatchers.IO) {
             mainScreenStateValue = mainScreenStateValue.copy(activeScreen = screen)
-            getRates()
+            when (screen) {
+                Screen.POPULAR -> getRates()
+                Screen.FAVORITE -> getFavoriteRates()
+            }
         }
     }
 
     fun changeChosenCurrency(currency: CurrenciesModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.fetchLatestCurrency(currency.symbol)
             mainScreenStateValue = mainScreenStateValue.copy(chosenCurrency = currency.symbol)
             getRates()
+            repo.fetchLatestCurrency(currency.symbol)
         }
     }
 
-    private fun subscribeCurrencyNames() {
+    private fun getCurrencyNames() {
         viewModelScope.launch(Dispatchers.IO) {
             repo.getCurrenciesList().onEach { names ->
                 mainScreenStateValue = mainScreenStateValue.copy(currenciesList = names)
@@ -95,9 +92,22 @@ class ExchangeViewModel : ViewModel() {
             repo.getCurrencyRatesSorted(
                 base = base,
                 ordering = mainScreenStateValue.ordering
-            ).onEach { rates ->
-                mainScreenStateValue = mainScreenStateValue.copy(currencyRates = rates)
-            }.launchIn(viewModelScope)
+            ).distinctUntilChanged()
+                .onEach { rates ->
+                    mainScreenStateValue = mainScreenStateValue.copy(currencyRates = rates)
+                }.launchIn(viewModelScope)
+        }
+    }
+
+    private fun getFavoriteRates() {
+        mainScreenStateValue.chosenCurrency?.let { base ->
+            repo.getFavoriteCurrencyRates(
+                base = base,
+                ordering = mainScreenStateValue.ordering
+            ).distinctUntilChanged()
+                .onEach { rates ->
+                    mainScreenStateValue = mainScreenStateValue.copy(favoritesRates = rates)
+                }.launchIn(viewModelScope)
         }
     }
 }

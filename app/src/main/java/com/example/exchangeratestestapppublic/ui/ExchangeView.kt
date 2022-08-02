@@ -6,7 +6,6 @@ import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.ExchangeViewModel
@@ -17,10 +16,6 @@ import com.example.exchangeratestestapppublic.Screen
 fun ExchangeView(viewModel: ExchangeViewModel) {
 
     val mainScreenState = viewModel.mainScreen.collectAsState().value
-
-    val favoriteCurrencyRates by viewModel.getFavoriteCurrencyRates(
-        base = "USD"
-    ).collectAsState(initial = emptyList())
 
     Scaffold(
         topBar = {
@@ -47,7 +42,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
                     viewModel = viewModel,
                     currencyRates = mainScreenState.currencyRates
                 )
-                Screen.FAVORITE -> FavoriteRatesScreen(favoriteCurrencyRates = favoriteCurrencyRates)
+                Screen.FAVORITE -> FavoriteRatesScreen(favoriteCurrencyRates = mainScreenState.favoritesRates)
             }
         }
 
