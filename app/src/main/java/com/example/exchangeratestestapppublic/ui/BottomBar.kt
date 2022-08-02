@@ -12,11 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.ExchangeViewModel
-import com.example.exchangeratestestapppublic.PopularScreenState
+import com.example.exchangeratestestapppublic.MainScreenState
 import com.example.exchangeratestestapppublic.Screen
 
 @Composable
-fun BottomBar(viewModel: ExchangeViewModel, state: PopularScreenState) {
+fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
     Surface(elevation = 8.dp, modifier = Modifier.height(75.dp)) {
         Row(
             modifier = Modifier

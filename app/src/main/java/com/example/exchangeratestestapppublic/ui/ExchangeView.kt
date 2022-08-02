@@ -1,6 +1,6 @@
 package com.example.exchangeratestestapppublic.ui
 
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
@@ -39,7 +39,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
         Card(
             modifier = Modifier
                 .padding(8.dp)
-                .fillMaxWidth(),
+                .fillMaxSize(),
             elevation = 4.dp
         ) {
             when (mainScreenState.activeScreen) {

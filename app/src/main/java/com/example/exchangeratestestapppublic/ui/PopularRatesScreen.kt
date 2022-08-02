@@ -21,19 +21,22 @@ fun PopularRatesScreen(
 ) {
 
     Column(Modifier.padding(16.dp)) {
-        currencyRates.forEach { currencyRatesModel ->
-            val isFavorite = currencyRatesModel.isQuoteFavorite
-            val icon = if (isFavorite) painterResource(id = R.drawable.ic_baseline_star_checked)
-            else painterResource(id = R.drawable.ic_baseline_star_border_unchecked)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (currencyRates.isEmpty()) {
-                    Text(text = "Empty list")
-                } else {
+        if (currencyRates.isEmpty()) {
+            Text(text = "Empty list")
+        } else {
+            currencyRates.forEach { currencyRatesModel ->
+                val isFavorite = currencyRatesModel.isQuoteFavorite
+                val icon = if (isFavorite) painterResource(id = R.drawable.ic_baseline_star_checked)
+                else painterResource(id = R.drawable.ic_baseline_star_border_unchecked)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
                     Text(text = currencyRatesModel.base, style = MaterialTheme.typography.h5)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(text = "/", style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(text = currencyRatesModel.quote, style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.width(16.dp))

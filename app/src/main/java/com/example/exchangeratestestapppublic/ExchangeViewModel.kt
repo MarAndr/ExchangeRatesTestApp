@@ -10,6 +10,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+data class MainScreenState(
+    val activeScreen: Screen = Screen.POPULAR,
+    val chosenCurrency: String? = null,
+    val currencyRates: List<CurrencyRatesModel> = emptyList(),
+    val currenciesList: List<CurrenciesModel> = emptyList(),
+    val ordering: Ordering = Ordering.QUOTE_ASC,
+)
+
 class ExchangeViewModel : ViewModel() {
 
     private val currencyRatesDao = Database.instance.currencyRatesDao()
@@ -20,14 +28,14 @@ class ExchangeViewModel : ViewModel() {
         currenciesDao = currencyRatesDao,
         currenciesListDao = currenciesListDao
     )
-    private val _mainScreen = MutableStateFlow(PopularScreenState())
-    val mainScreen: StateFlow<PopularScreenState> = _mainScreen
+    private val _mainScreen = MutableStateFlow(MainScreenState())
+    val mainScreen: StateFlow<MainScreenState> = _mainScreen
 
     fun getFavoriteCurrencyRates(base: String?): Flow<List<CurrencyRatesModel>> =
         repo.getFavoriteCurrencyRates(base)
 
 
-    private var mainScreenStateValue: PopularScreenState
+    private var mainScreenStateValue: MainScreenState
         get() = _mainScreen.value
         set(value) {
             _mainScreen.value = value
