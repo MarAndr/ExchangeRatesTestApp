@@ -20,7 +20,6 @@ fun PopularRatesScreen(
     viewModel: ExchangeViewModel
 ) {
 
-
     Column(Modifier.padding(16.dp)) {
         currencyRates.forEach { currencyRatesModel ->
             val isFavorite = currencyRatesModel.isQuoteFavorite
@@ -31,24 +30,31 @@ fun PopularRatesScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = currencyRatesModel.quote, style = MaterialTheme.typography.h5)
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "=", style = MaterialTheme.typography.h5)
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = currencyRatesModel.rate.toString(), style = MaterialTheme.typography.h5)
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    modifier = Modifier.clickable {
-                        viewModel.changeQuoteFavorite(
-                            isFavorite = !isFavorite,
-                            quote = currencyRatesModel.quote
-                        )
-                    },
-                    painter = icon,
-                    contentDescription = ""
-                )
-
+                if (currencyRates.isEmpty()) {
+                    Text(text = "Empty list")
+                } else {
+                    Text(text = currencyRatesModel.base, style = MaterialTheme.typography.h5)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(text = currencyRatesModel.quote, style = MaterialTheme.typography.h5)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(text = "=", style = MaterialTheme.typography.h5)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = currencyRatesModel.rate.toString(),
+                        style = MaterialTheme.typography.h5
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        modifier = Modifier.clickable {
+                            viewModel.changeQuoteFavorite(
+                                isFavorite = !isFavorite,
+                                quote = currencyRatesModel.quote
+                            )
+                        },
+                        painter = icon,
+                        contentDescription = ""
+                    )
+                }
             }
         }
     }

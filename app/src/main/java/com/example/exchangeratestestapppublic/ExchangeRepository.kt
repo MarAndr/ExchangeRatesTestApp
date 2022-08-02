@@ -1,6 +1,5 @@
 package com.example.exchangeratestestapppublic
 
-import android.util.Log
 import com.example.exchangeratestestapppublic.api.ExchangeApi
 import com.example.exchangeratestestapppublic.db.CurrenciesListDao
 import com.example.exchangeratestestapppublic.db.CurrenciesModel
@@ -55,7 +54,6 @@ class ExchangeRepository(
 
     suspend fun fetchCurrencyNamesList() {
         if (currenciesListDao.getCurrenciesList().isEmpty()) {
-            Log.d("MY_TAG", "fetchCurrencyNamesList:")
             val response = retrofit.getCurrencyNamesList()
             if (response.success != false) {
                 response.symbols?.let {
