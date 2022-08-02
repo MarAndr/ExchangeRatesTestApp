@@ -17,7 +17,8 @@ import com.example.exchangeratestestapppublic.db.CurrenciesModel
 
 @Composable
 fun TopBar(
-    items: List<CurrenciesModel>, onClick: (CurrenciesModel) -> Unit,
+    items: List<CurrenciesModel>,
+    onClick: (CurrenciesModel) -> Unit,
     onSortAscQuoteClick: () -> Unit,
     onSortDescQuoteClick: () -> Unit,
     onSortAscRateClick: () -> Unit,
@@ -49,6 +50,7 @@ fun DropdownMenu(
     }
     var expanded by remember { mutableStateOf(false) }
     var selectedIndex: Int? by remember { mutableStateOf(null) }
+
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
@@ -58,24 +60,15 @@ fun DropdownMenu(
             contentAlignment = Alignment.Center
         ) {
 
-            selectedIndex?.let { index ->
-                onClick(items[index])
+            val index = selectedIndex
+            if (index != null) {
                 Text(
                     text = "${items[index].name}(${items[index].symbol})",
                     style = MaterialTheme.typography.h5
                 )
-            } ?: run {
+            } else {
                 Text(text = "Choose a currency", style = MaterialTheme.typography.h5)
             }
-//            if (selectedIndex != null) {
-//                onClick(items[selectedIndex!!])
-//                Text(
-//                    text = items[selectedIndex!!],
-//                    style = MaterialTheme.typography.h5
-//                )
-//            } else {
-//                Text(text = "Choose a currency", style = MaterialTheme.typography.h5)
-//            }
 
             DropdownMenu(
                 expanded = expanded,
@@ -90,6 +83,7 @@ fun DropdownMenu(
                     DropdownMenuItem(onClick = {
                         selectedIndex = index
                         expanded = false
+                        onClick(items[index])
                     }) {
                         Text(text = s.name)
                     }

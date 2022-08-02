@@ -7,19 +7,13 @@ import com.example.exchangeratestestapppublic.db.CurrenciesModel
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 import com.example.exchangeratestestapppublic.db.Database
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ExchangeViewModel : ViewModel() {
 
     private val currencyRatesDao = Database.instance.currencyRatesDao()
     private val currenciesListDao = Database.instance.currenciesListDao()
-
-//    private val _currenciesList = MutableStateFlow(emptyList<CurrenciesModel>())
-//    val currenciesList: StateFlow<List<CurrenciesModel>> = _currenciesList
 
     private val repo = ExchangeRepository(
         retrofit = ExchangeApi.getApi(),
@@ -28,9 +22,6 @@ class ExchangeViewModel : ViewModel() {
     )
     private val _mainScreen = MutableStateFlow(PopularScreenState())
     val mainScreen: StateFlow<PopularScreenState> = _mainScreen
-
-    fun getCurrencyRates(base: String?): Flow<List<CurrencyRatesModel>> =
-        repo.getCurrencyRates(base)
 
     fun getFavoriteCurrencyRates(base: String?): Flow<List<CurrencyRatesModel>> =
         repo.getFavoriteCurrencyRates(base)
@@ -42,52 +33,68 @@ class ExchangeViewModel : ViewModel() {
             _mainScreen.value = value
         }
 
-    fun changeQuoteFavorite(isFavorite: Boolean, quote: String) {
-        viewModelScope.launch {
-            currencyRatesDao.changeFavoriteField(isFavorite, quote)
-        }
-    }
-
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                getRates()
                 repo.fetchCurrencyNamesList()
-//                repo.getCurrencyRatesSorted()
+                subscribeCurrencyNames()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
 
-    fun changeOrder(ordering: Ordering) {
-        viewModelScope.launch {
-            mainScreenStateValue.chosenCurrency?.let {
-                repo.getCurrencyRatesSorted(
-                    base = it,
-                    ordering = ordering
-                ).collectLatest {
-//                    mainScreenStateValue = mainScreenStateValue.copy(currencyRates = it)
-                }
-            }
-
+    fun changeQuoteFavorite(isFavorite: Boolean, quote: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            currencyRatesDao.changeFavoriteField(isFavorite, quote)
+            getRates()
         }
+    }
 
-
+    fun changeOrder(ordering: Ordering) {
+        viewModelScope.launch(Dispatchers.IO) {
+            mainScreenStateValue = mainScreenStateValue.copy(ordering = ordering)
+            getRates()
+        }
     }
 
     fun changeScreen(screen: Screen) {
-        mainScreenStateValue = mainScreenStateValue.copy(activeScreen = screen)
+        viewModelScope.launch(Dispatchers.IO) {
+            mainScreenStateValue = mainScreenStateValue.copy(activeScreen = screen)
+            getRates()
+        }
     }
 
     fun changeChosenCurrency(currency: CurrenciesModel) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.fetchLatestCurrency(currency.symbol)
+            mainScreenStateValue = mainScreenStateValue.copy(chosenCurrency = currency.symbol)
+            getRates()
         }
-        mainScreenStateValue = mainScreenStateValue.copy(chosenCurrency = currency.symbol)
+    }
+
+    private fun subscribeCurrencyNames() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.getCurrenciesList().onEach { names ->
+                mainScreenStateValue = mainScreenStateValue.copy(currenciesList = names)
+            }.collect()
+        }
+    }
+
+    private fun getRates() {
+        mainScreenStateValue.chosenCurrency?.let { base ->
+            repo.getCurrencyRatesSorted(
+                base = base,
+                ordering = mainScreenStateValue.ordering
+            ).onEach { rates ->
+                mainScreenStateValue = mainScreenStateValue.copy(currencyRates = rates)
+            }.launchIn(viewModelScope)
+        }
     }
 }
 
-enum class Ordering() {
+enum class Ordering {
     QUOTE_ASC,
     QUOTE_DESC,
     RATE_DESC,

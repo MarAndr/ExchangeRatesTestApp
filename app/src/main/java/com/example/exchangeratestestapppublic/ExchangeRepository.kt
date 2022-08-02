@@ -2,7 +2,10 @@ package com.example.exchangeratestestapppublic
 
 import android.util.Log
 import com.example.exchangeratestestapppublic.api.ExchangeApi
-import com.example.exchangeratestestapppublic.db.*
+import com.example.exchangeratestestapppublic.db.CurrenciesListDao
+import com.example.exchangeratestestapppublic.db.CurrenciesModel
+import com.example.exchangeratestestapppublic.db.CurrencyRatesDao
+import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 import kotlinx.coroutines.flow.Flow
 
 class ExchangeRepository(
@@ -33,54 +36,22 @@ class ExchangeRepository(
         }
     }
 
-    fun getCurrencyRates(base: String? = null): Flow<List<CurrencyRatesModel>> {
-        return currenciesDao.getCurrencyRates(base)
-    }
-
     fun getCurrencyRatesSorted(base: String, ordering: Ordering): Flow<List<CurrencyRatesModel>> {
         return when (ordering) {
-            Ordering.QUOTE_ASC -> currenciesDao.getCurrencyRatesSorted(
-                base,
-                "${CurrencyRatesContract.CurrencyRatesColumn.QUOTE} ASC"
-            )
-            Ordering.QUOTE_DESC -> currenciesDao.getCurrencyRatesSorted(
-                base,
-                "${CurrencyRatesContract.CurrencyRatesColumn.QUOTE} DESC"
-            )
-            Ordering.RATE_ASC -> currenciesDao.getCurrencyRatesSorted(
-                base,
-                "${CurrencyRatesContract.CurrencyRatesColumn.RATE} ASC"
-            )
-            Ordering.RATE_DESC -> currenciesDao.getCurrencyRatesSorted(
-                base,
-                "${CurrencyRatesContract.CurrencyRatesColumn.RATE} DESC"
-            )
+            Ordering.QUOTE_ASC -> currenciesDao.getCurrencyRatesOrderByQuote(base, true)
+            Ordering.QUOTE_DESC -> currenciesDao.getCurrencyRatesOrderByQuote(base, false)
+            Ordering.RATE_ASC -> currenciesDao.getCurrencyRatesOrderByRate(base, true)
+            Ordering.RATE_DESC -> currenciesDao.getCurrencyRatesOrderByRate(base, false)
         }
-    }
-
-    fun getCurrencyRatesSortedByAscQuote(base: String): Flow<List<CurrencyRatesModel>> {
-        return currenciesDao.getCurrencyRatesSortedByAscQuote(base)
-    }
-
-    fun getCurrencyRatesSortedByDescQuote(base: String): Flow<List<CurrencyRatesModel>> {
-        return currenciesDao.getCurrencyRatesSortedByDescQuote(base)
-    }
-
-    fun getCurrencyRatesSortedByAscRate(base: String): Flow<List<CurrencyRatesModel>> {
-        return currenciesDao.getCurrencyRatesSortedByAscRate(base)
-    }
-
-    fun getCurrencyRatesSortedByDescRate(base: String): Flow<List<CurrencyRatesModel>> {
-        return currenciesDao.getCurrencyRatesSortedByDescRate(base)
     }
 
     fun getFavoriteCurrencyRates(base: String? = null): Flow<List<CurrencyRatesModel>> {
         return currenciesDao.getFavoriteCurrencyRates(base)
     }
 
-//    fun getCurrenciesList(): Flow<List<CurrenciesModel>> {
-//        return currenciesListDao.getCurrencies()
-//    }
+    fun getCurrenciesList(): Flow<List<CurrenciesModel>> {
+        return currenciesListDao.getCurrencies()
+    }
 
     suspend fun fetchCurrencyNamesList() {
         if (currenciesListDao.getCurrenciesList().isEmpty()) {
