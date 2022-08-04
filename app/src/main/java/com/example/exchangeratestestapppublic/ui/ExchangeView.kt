@@ -2,6 +2,8 @@ package com.example.exchangeratestestapppublic.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
@@ -33,7 +35,8 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
     ) {
         Card(
             modifier = Modifier
-                .padding(8.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 83.dp)
                 .fillMaxSize(),
             elevation = 4.dp
         ) {

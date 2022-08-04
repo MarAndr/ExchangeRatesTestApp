@@ -20,9 +20,15 @@ fun PopularRatesScreen(
     viewModel: ExchangeViewModel
 ) {
 
-    Column(Modifier.padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         if (currencyRates.isEmpty()) {
-            Text(text = "Empty list")
+            Text(text = "Empty list", style = MaterialTheme.typography.h5)
         } else {
             currencyRates.forEach { currencyRatesModel ->
                 val isFavorite = currencyRatesModel.isQuoteFavorite

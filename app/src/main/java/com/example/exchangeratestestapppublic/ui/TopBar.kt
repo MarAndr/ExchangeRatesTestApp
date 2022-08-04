@@ -51,24 +51,37 @@ fun DropdownMenu(
     var expanded by remember { mutableStateOf(false) }
     var selectedIndex: Int? by remember { mutableStateOf(null) }
 
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
         Box(
             modifier = Modifier
-                .weight(0.8f)
-                .background(Color.White)
-                .clickable { expanded = true },
+//                .weight(0.8f)
+                .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
 
             val index = selectedIndex
-            if (index != null) {
-                Text(
-                    text = "${items[index].name}(${items[index].symbol})",
-                    style = MaterialTheme.typography.h5
-                )
-            } else {
-                Text(text = "Choose a currency", style = MaterialTheme.typography.h5)
+            Button(onClick = { expanded = true }) {
+                if (index != null) {
+                    Text(
+                        text = "${items[index].name}(${items[index].symbol})",
+                        style = MaterialTheme.typography.h6,
+                        maxLines = 1
+                    )
+                } else {
+                    Text(
+                        text = "Выбор валюты",
+                        style = MaterialTheme.typography.h6,
+                        maxLines = 1
+                    )
+                }
             }
+
 
             DropdownMenu(
                 expanded = expanded,
@@ -91,17 +104,17 @@ fun DropdownMenu(
             }
         }
 
-        Box(Modifier.weight(0.2f)) {
-            Row {
-                Icon(
-                    modifier = Modifier.clickable {
-                        isSortingDialog = true
-                    },
-                    painter = painterResource(id = R.drawable.ic_baseline_sort),
-                    contentDescription = ""
-                )
-            }
-        }
+//        Box(Modifier.weight(0.2f)) {
+//            Row {
+        Icon(
+            modifier = Modifier.clickable {
+                isSortingDialog = true
+            },
+            painter = painterResource(id = R.drawable.ic_baseline_sort),
+            contentDescription = ""
+        )
+//            }
+//        }
 
     }
 

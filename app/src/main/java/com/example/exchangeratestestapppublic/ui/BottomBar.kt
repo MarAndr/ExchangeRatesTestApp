@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +28,7 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
                 modifier = Modifier
                     .background(
                         color = if (state.activeScreen == Screen.POPULAR) {
-                            Color.Blue.copy(alpha = 0.5f)
+                            Color.LightGray.copy(alpha = 0.5f)
                         } else Color.White
                     )
                     .fillMaxHeight()
@@ -37,7 +38,7 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
                     .weight(0.5f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Популярное", color = Color.Blue)
+                Text(text = "Популярное", style = MaterialTheme.typography.h5)
             }
 
             Divider(
@@ -49,7 +50,7 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
                 modifier = Modifier
                     .background(
                         color = if (state.activeScreen == Screen.FAVORITE) {
-                            Color.Blue.copy(alpha = 0.5f)
+                            Color.LightGray.copy(alpha = 0.5f)
                         } else Color.White
                     )
                     .fillMaxHeight()
@@ -59,7 +60,7 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
                     .weight(0.5f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Избранное", color = Color.Blue)
+                Text(text = "Избранное", style = MaterialTheme.typography.h5)
             }
         }
     }
