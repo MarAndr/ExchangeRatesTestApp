@@ -1,5 +1,6 @@
 package com.example.exchangeratestestapppublic
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.exchangeratestestapppublic.db.CurrenciesModel
@@ -40,7 +41,7 @@ class ExchangeViewModel @Inject constructor(
                 getCurrencyNames()
                 repo.fetchCurrencyNamesList()
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(this@ExchangeViewModel.javaClass.name, "", e)
             }
         }
     }
@@ -73,9 +74,14 @@ class ExchangeViewModel @Inject constructor(
 
     fun changeChosenCurrency(currency: CurrenciesModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            mainScreenStateValue = mainScreenStateValue.copy(chosenCurrency = currency.symbol)
-            getRates()
-            repo.fetchLatestCurrency(currency.symbol)
+            try {
+                mainScreenStateValue = mainScreenStateValue.copy(chosenCurrency = currency.symbol)
+                getRates()
+                getFavoriteRates()
+                repo.fetchLatestCurrency(currency.symbol)
+            } catch (e: Exception) {
+                Log.e(this@ExchangeViewModel.javaClass.name, "", e)
+            }
         }
     }
 

@@ -8,7 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.exchangeratestestapppublic.R
@@ -24,14 +26,14 @@ fun TopBar(
     onSortAscRateClick: () -> Unit,
     onSortDescRateClick: () -> Unit
 ) {
-    Surface(elevation = 8.dp, modifier = Modifier.height(75.dp)) {
+    Surface(elevation = 8.dp, modifier = Modifier) {
         DropdownMenu(
             items = items,
             onClick = onClick,
-            onSortAscQuoteClick,
-            onSortDescQuoteClick,
-            onSortAscRateClick,
-            onSortDescRateClick
+            onSortAscQuoteClick = onSortAscQuoteClick,
+            onSortDescQuoteClick = onSortDescQuoteClick,
+            onSortAscRateClick = onSortAscRateClick,
+            onSortDescRateClick = onSortDescRateClick
         )
     }
 }
@@ -50,28 +52,34 @@ fun DropdownMenu(
     }
     var expanded by remember { mutableStateOf(false) }
     var selectedIndex: Int? by remember { mutableStateOf(null) }
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val buttonMaxWidth = screenWidth / 1.5f
 
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Box(
             modifier = Modifier
-//                .weight(0.8f)
                 .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
 
             val index = selectedIndex
-            Button(onClick = { expanded = true }) {
+
+            Button(
+                modifier = Modifier.requiredWidthIn(max = buttonMaxWidth),
+                onClick = { expanded = true }) {
                 if (index != null) {
                     Text(
                         text = "${items[index].name}(${items[index].symbol})",
                         style = MaterialTheme.typography.h6,
-                        maxLines = 1
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 } else {
                     Text(
@@ -104,8 +112,6 @@ fun DropdownMenu(
             }
         }
 
-//        Box(Modifier.weight(0.2f)) {
-//            Row {
         Icon(
             modifier = Modifier.clickable {
                 isSortingDialog = true
@@ -113,9 +119,6 @@ fun DropdownMenu(
             painter = painterResource(id = R.drawable.ic_baseline_sort),
             contentDescription = ""
         )
-//            }
-//        }
-
     }
 
     if (isSortingDialog) {

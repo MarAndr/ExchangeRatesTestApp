@@ -1,15 +1,13 @@
 package com.example.exchangeratestestapppublic
 
-import android.util.Log
 import com.example.exchangeratestestapppublic.api.ExchangeApi
 import com.example.exchangeratestestapppublic.db.CurrenciesListDao
 import com.example.exchangeratestestapppublic.db.CurrenciesModel
 import com.example.exchangeratestestapppublic.db.CurrencyRatesDao
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 class ExchangeRepository @Inject constructor(
     private val retrofit: ExchangeApi,
@@ -17,11 +15,8 @@ class ExchangeRepository @Inject constructor(
     private val currenciesListDao: CurrenciesListDao
 ) {
 
-    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Log.d("MY_TAG", "${throwable.message}")
-    }
 
-    suspend fun fetchLatestCurrency(base: String) = withContext(coroutineExceptionHandler) {
+    suspend fun fetchLatestCurrency(base: String) {
         val response = retrofit.getLatestCurrency(
             base = base,
             symbols = Symbols.getSymbolsString()
@@ -33,7 +28,7 @@ class ExchangeRepository @Inject constructor(
                         timestamp = response.timestamp ?: 0,
                         base = base,
                         quote = quote,
-                        rate = rate,
+                        rate = (rate * 1000.0).roundToInt() / 1000.0,
                         isQuoteFavorite = currenciesDao.getFavoriteField(quote) ?: false
                     )
 
@@ -65,7 +60,7 @@ class ExchangeRepository @Inject constructor(
         return currenciesListDao.getCurrencies()
     }
 
-    suspend fun fetchCurrencyNamesList() = withContext(coroutineExceptionHandler) {
+    suspend fun fetchCurrencyNamesList() {
         if (currenciesListDao.getCurrenciesList().isEmpty()) {
             val response = retrofit.getCurrencyNamesList()
             if (response.success != false) {

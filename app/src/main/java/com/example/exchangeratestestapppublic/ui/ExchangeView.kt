@@ -22,7 +22,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
     Scaffold(
         topBar = {
             TopBar(
-                mainScreenState.currenciesList,
+                items = mainScreenState.currenciesList,
                 onClick = { viewModel.changeChosenCurrency(it) },
                 onSortDescRateClick = { viewModel.changeOrder(Ordering.RATE_DESC) },
                 onSortAscRateClick = { viewModel.changeOrder(Ordering.RATE_ASC) },

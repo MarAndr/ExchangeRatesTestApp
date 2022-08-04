@@ -7,13 +7,13 @@ import retrofit2.http.Query
 interface ExchangeApi {
 
     @GET("exchangerates_data/latest")
-    @Headers("apikey: L84JCatpD9MPVFV0wIKV8DIoBNdPzMop")
+    @Headers("apikey: 6j9BqM9zJ06Ceyb2CZK8WGHFmDLVgwDT")
     suspend fun getLatestCurrency(
         @Query("base") base: String,
         @Query("symbols") symbols: String
     ): LatestCurrencyResponse
 
     @GET("exchangerates_data/symbols")
-    @Headers("apikey: L84JCatpD9MPVFV0wIKV8DIoBNdPzMop")
+    @Headers("apikey: 6j9BqM9zJ06Ceyb2CZK8WGHFmDLVgwDT")
     suspend fun getCurrencyNamesList(): CurrenciesNameResponse
 }
