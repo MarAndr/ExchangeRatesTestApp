@@ -46,7 +46,9 @@ fun FavoriteRatesScreen(
                         style = MaterialTheme.typography.h5
                     )
                 }
+                Spacer(modifier = Modifier.padding(top = 8.dp))
                 Divider()
+                Spacer(modifier = Modifier.padding(top = 8.dp))
             }
         }
     }

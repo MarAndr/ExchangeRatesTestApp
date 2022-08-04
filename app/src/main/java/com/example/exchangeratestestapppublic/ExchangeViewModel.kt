@@ -17,7 +17,11 @@ data class MainScreenState(
     val currencyRates: List<CurrencyRatesModel> = emptyList(),
     val currenciesList: List<CurrenciesModel> = emptyList(),
     val ordering: Ordering = Ordering.QUOTE_ASC,
-    val favoritesRates: List<CurrencyRatesModel> = emptyList()
+    val favoritesRates: List<CurrencyRatesModel> = emptyList(),
+    val error: ExchangeApiError = ExchangeApiError(
+        isError = false,
+        exception = java.lang.Exception()
+    )
 )
 
 @HiltViewModel
@@ -40,7 +44,19 @@ class ExchangeViewModel @Inject constructor(
                 getRates()
                 getCurrencyNames()
                 repo.fetchCurrencyNamesList()
+                mainScreenStateValue = mainScreenStateValue.copy(
+                    error = ExchangeApiError(
+                        isError = true,
+                        exception = java.lang.Exception("Test Exception")
+                    )
+                )
             } catch (e: Exception) {
+                mainScreenStateValue = mainScreenStateValue.copy(
+                    error = ExchangeApiError(
+                        isError = true,
+                        exception = e
+                    )
+                )
                 Log.e(this@ExchangeViewModel.javaClass.name, "", e)
             }
         }

@@ -68,8 +68,9 @@ fun PopularRatesScreen(
                         )
                     }
                 }
-
+                Spacer(modifier = Modifier.padding(top = 8.dp))
                 Divider()
+                Spacer(modifier = Modifier.padding(top = 8.dp))
             }
         }
     }

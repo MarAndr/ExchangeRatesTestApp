@@ -13,12 +13,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.exchangeratestestapppublic.MainScreenState
 import com.example.exchangeratestestapppublic.R
 import com.example.exchangeratestestapppublic.db.CurrenciesModel
 
 
 @Composable
 fun TopBar(
+    mainScreenState: MainScreenState,
     items: List<CurrenciesModel>,
     onClick: (CurrenciesModel) -> Unit,
     onSortAscQuoteClick: () -> Unit,
@@ -28,6 +30,7 @@ fun TopBar(
 ) {
     Surface(elevation = 8.dp, modifier = Modifier) {
         DropdownMenu(
+            mainScreenState = mainScreenState,
             items = items,
             onClick = onClick,
             onSortAscQuoteClick = onSortAscQuoteClick,
@@ -40,6 +43,7 @@ fun TopBar(
 
 @Composable
 fun DropdownMenu(
+    mainScreenState: MainScreenState,
     items: List<CurrenciesModel>,
     onClick: (CurrenciesModel) -> Unit,
     onSortAscQuoteClick: () -> Unit,
@@ -55,6 +59,9 @@ fun DropdownMenu(
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val buttonMaxWidth = screenWidth / 1.5f
+    var isShowingSnackbar by remember {
+        mutableStateOf(false)
+    }
 
     Row(
         Modifier
@@ -102,6 +109,7 @@ fun DropdownMenu(
             ) {
                 items.forEachIndexed { index, s ->
                     DropdownMenuItem(onClick = {
+                        isShowingSnackbar = true
                         selectedIndex = index
                         expanded = false
                         onClick(items[index])
@@ -119,7 +127,12 @@ fun DropdownMenu(
             painter = painterResource(id = R.drawable.ic_baseline_sort),
             contentDescription = ""
         )
+
     }
+
+//    ExchangeSnackbar(isShowing = isShowingSnackbar) {
+//        isShowingSnackbar = false
+//    }
 
     if (isSortingDialog) {
         SortingDialog(
