@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -22,6 +23,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
     val mainScreenState = viewModel.mainScreen.collectAsState().value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
@@ -49,6 +51,9 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
             BottomBar(viewModel = viewModel, state = mainScreenState)
         }
     ) {
+        if (mainScreenState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.padding(200.dp))
+        }
         Card(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
@@ -71,7 +76,10 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
                         )
                     }
                 }
-                Screen.FAVORITE -> FavoriteRatesScreen(favoriteCurrencyRates = mainScreenState.favoritesRates)
+                Screen.FAVORITE -> FavoriteRatesScreen(
+                    favoriteCurrencyRates = mainScreenState.favoritesRates,
+                    mainScreenState = mainScreenState
+                )
             }
         }
 

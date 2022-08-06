@@ -9,6 +9,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 data class MainScreenState(
@@ -18,13 +20,19 @@ data class MainScreenState(
     val currenciesList: List<CurrenciesModel> = emptyList(),
     val ordering: Ordering = Ordering.QUOTE_ASC,
     val favoritesRates: List<CurrencyRatesModel> = emptyList(),
-    val error: Exception? = null
+    val error: Exception? = null,
+    val isLoading: Boolean = false
 )
 
 @HiltViewModel
 class ExchangeViewModel @Inject constructor(
-    private val repo: ExchangeRepository
+    private val repository: ExchangeRepository
 ) : ViewModel() {
+
+    companion object {
+        //        val MIN_DELAY_REQUEST = TimeUnit.HOURS.toMillis(2)
+        val MIN_DELAY_REQUEST = TimeUnit.MINUTES.toSeconds(1)
+    }
 
     private val _mainScreen = MutableStateFlow(MainScreenState())
     val mainScreen: StateFlow<MainScreenState> = _mainScreen
@@ -40,7 +48,10 @@ class ExchangeViewModel @Inject constructor(
             try {
                 getRates()
                 getCurrencyNames()
-                repo.fetchCurrencyNamesList()
+                mainScreenStateValue = mainScreenStateValue.copy(isLoading = true)
+                repository.fetchCurrencyNamesList()
+                mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
+
             } catch (e: Exception) {
                 mainScreenStateValue = mainScreenStateValue.copy(
                     error = e
@@ -51,7 +62,7 @@ class ExchangeViewModel @Inject constructor(
 
     fun changeQuoteFavorite(isFavorite: Boolean, quote: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.changeFavoriteField(isFavorite, quote)
+            repository.changeFavoriteField(isFavorite, quote)
         }
     }
 
@@ -81,36 +92,45 @@ class ExchangeViewModel @Inject constructor(
                 mainScreenStateValue = mainScreenStateValue.copy(chosenCurrency = currency.symbol)
                 getRates()
                 getFavoriteRates()
-                repo.fetchLatestCurrency(currency.symbol)
             } catch (e: Exception) {
-                Log.e(this@ExchangeViewModel.javaClass.name, "", e)
+                mainScreenStateValue = mainScreenStateValue.copy(
+                    error = e
+                )
             }
         }
     }
 
     private fun getCurrencyNames() {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getCurrenciesList().onEach { names ->
+            repository.getCurrenciesList().onEach { names ->
                 mainScreenStateValue = mainScreenStateValue.copy(currenciesList = names)
             }.collect()
         }
     }
 
     private fun getRates() {
+
         mainScreenStateValue.chosenCurrency?.let { base ->
-            repo.getCurrencyRatesSorted(
+            repository.getCurrencyRatesSorted(
                 base = base,
                 ordering = mainScreenStateValue.ordering
             ).distinctUntilChanged()
                 .onEach { rates ->
+                    val timeDif = TimeUnit.MILLISECONDS.toSeconds(
+                        System.currentTimeMillis()
+                    ) - MIN_DELAY_REQUEST
+                    if (rates.isEmpty() || rates.minOf { it.timestamp } < timeDif) {
+                        repository.fetchLatestCurrency(base)
+                        Log.d("MY_TAG", "$timeDif")
+                    }
                     mainScreenStateValue = mainScreenStateValue.copy(currencyRates = rates)
-                }.launchIn(viewModelScope)
+                }.launchIn(viewModelScope + Dispatchers.IO)
         }
     }
 
     private fun getFavoriteRates() {
         mainScreenStateValue.chosenCurrency?.let { base ->
-            repo.getFavoriteCurrencyRates(
+            repository.getFavoriteCurrencyRates(
                 base = base,
                 ordering = mainScreenStateValue.ordering
             ).distinctUntilChanged()

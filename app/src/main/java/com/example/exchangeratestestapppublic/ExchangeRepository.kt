@@ -5,6 +5,7 @@ import com.example.exchangeratestestapppublic.db.CurrenciesListDao
 import com.example.exchangeratestestapppublic.db.CurrenciesModel
 import com.example.exchangeratestestapppublic.db.CurrencyRatesDao
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -31,7 +32,6 @@ class ExchangeRepository @Inject constructor(
                         rate = (rate * 1000.0).roundToInt() / 1000.0,
                         isQuoteFavorite = currenciesDao.getFavoriteField(quote) ?: false
                     )
-
                     currenciesDao.addCurrencyRates(currencyRatesModel = currencyRateModel)
                 }
             }
@@ -62,7 +62,9 @@ class ExchangeRepository @Inject constructor(
 
     suspend fun fetchCurrencyNamesList() {
         if (currenciesListDao.getCurrenciesList().isEmpty()) {
+            delay(10000)
             val response = retrofit.getCurrencyNamesList()
+
             if (response.success != false) {
                 response.symbols?.let {
                     it.forEach { (symbol, name) ->

@@ -9,11 +9,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.exchangeratestestapppublic.MainScreenState
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 
 @Composable
 fun FavoriteRatesScreen(
     favoriteCurrencyRates: List<CurrencyRatesModel>,
+    mainScreenState: MainScreenState
 ) {
     Column(
         Modifier
@@ -22,9 +24,9 @@ fun FavoriteRatesScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (favoriteCurrencyRates.isEmpty()) {
+        if (favoriteCurrencyRates.isEmpty() || mainScreenState.chosenCurrency == null) {
             Text(
-                text = "Выберите базовую валюту для получения списка валют",
+                text = "Список избранного пуст или вы не выбрали базовую валюту",
                 style = MaterialTheme.typography.h5,
                 color = Color.Gray
             )
