@@ -9,7 +9,6 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,7 +67,7 @@ fun DropdownMenu(
     ) {
         Box(
             modifier = Modifier
-                .background(Color.White),
+                .background(MaterialTheme.colors.background),
             contentAlignment = Alignment.Center
         ) {
 
@@ -101,7 +100,7 @@ fun DropdownMenu(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        Color.White
+                        MaterialTheme.colors.background
                     )
             ) {
                 items.forEachIndexed { index, s ->
@@ -110,7 +109,7 @@ fun DropdownMenu(
                         expanded = false
                         onClick(items[index])
                     }) {
-                        Text(text = s.name)
+                        Text(text = s.name, style = MaterialTheme.typography.body1)
                     }
                     Divider(modifier = Modifier.padding(vertical = 16.dp))
                 }
@@ -129,8 +128,6 @@ fun DropdownMenu(
         )
 
     }
-
-
 
     if (isSortingDialog) {
         SortingDialog(

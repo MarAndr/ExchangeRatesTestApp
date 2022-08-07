@@ -10,7 +10,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.ExchangeViewModel
 import com.example.exchangeratestestapppublic.MainScreenState
@@ -28,8 +27,8 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
                 modifier = Modifier
                     .background(
                         color = if (state.activeScreen == Screen.POPULAR) {
-                            Color.LightGray.copy(alpha = 0.5f)
-                        } else Color.White
+                            MaterialTheme.colors.secondary
+                        } else MaterialTheme.colors.background
                     )
                     .fillMaxHeight()
                     .clickable {
@@ -50,8 +49,8 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
                 modifier = Modifier
                     .background(
                         color = if (state.activeScreen == Screen.FAVORITE) {
-                            Color.LightGray.copy(alpha = 0.5f)
-                        } else Color.White
+                            MaterialTheme.colors.secondary
+                        } else MaterialTheme.colors.background
                     )
                     .fillMaxHeight()
                     .clickable {

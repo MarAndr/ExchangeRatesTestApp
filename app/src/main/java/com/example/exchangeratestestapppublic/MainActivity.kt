@@ -19,7 +19,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            ExchangeView(viewModel = viewModel)
+            ExchangeRatesTestAppPublicTheme {
+                ExchangeView(viewModel = viewModel)
+            }
         }
 
     }
