@@ -73,12 +73,14 @@ class Module {
     fun bindRepository(
         api: ExchangeApi,
         currencyRatesDao: CurrencyRatesDao,
-        currenciesListDao: CurrenciesListDao
+        currenciesListDao: CurrenciesListDao,
+        currencyDatabase: CurrencyDatabase
     ): ExchangeRepository {
         return ExchangeRepository(
             retrofit = api,
             currenciesDao = currencyRatesDao,
-            currenciesListDao = currenciesListDao
+            currenciesListDao = currenciesListDao,
+            db = currencyDatabase
         )
     }
 }

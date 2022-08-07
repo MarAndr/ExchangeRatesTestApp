@@ -1,15 +1,12 @@
 package com.example.exchangeratestestapppublic
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.exchangeratestestapppublic.db.CurrenciesModel
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -30,12 +27,12 @@ class ExchangeViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        //        val MIN_DELAY_REQUEST = TimeUnit.HOURS.toMillis(2)
-        val MIN_DELAY_REQUEST = TimeUnit.MINUTES.toSeconds(1)
+        val MIN_DELAY_REQUEST = TimeUnit.HOURS.toMillis(2)
     }
 
     private val _mainScreen = MutableStateFlow(MainScreenState())
     val mainScreen: StateFlow<MainScreenState> = _mainScreen
+    private var ratesJob: Job? = null
 
     private var mainScreenStateValue: MainScreenState
         get() = _mainScreen.value
@@ -46,8 +43,8 @@ class ExchangeViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                getRates()
                 getCurrencyNames()
+                getRates()
                 mainScreenStateValue = mainScreenStateValue.copy(isLoading = true)
                 repository.fetchCurrencyNamesList()
                 mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
@@ -109,22 +106,27 @@ class ExchangeViewModel @Inject constructor(
     }
 
     private fun getRates() {
-
         mainScreenStateValue.chosenCurrency?.let { base ->
-            repository.getCurrencyRatesSorted(
-                base = base,
-                ordering = mainScreenStateValue.ordering
-            ).distinctUntilChanged()
-                .onEach { rates ->
-                    val timeDif = TimeUnit.MILLISECONDS.toSeconds(
-                        System.currentTimeMillis()
-                    ) - MIN_DELAY_REQUEST
-                    if (rates.isEmpty() || rates.minOf { it.timestamp } < timeDif) {
-                        repository.fetchLatestCurrency(base)
-                        Log.d("MY_TAG", "$timeDif")
-                    }
-                    mainScreenStateValue = mainScreenStateValue.copy(currencyRates = rates)
-                }.launchIn(viewModelScope + Dispatchers.IO)
+            viewModelScope.launch {
+                ratesJob?.cancelAndJoin()
+                ratesJob = repository.getCurrencyRatesSorted(
+                    base = base,
+                    ordering = mainScreenStateValue.ordering
+                ).distinctUntilChanged()
+                    .onEach { rates ->
+                        mainScreenStateValue = mainScreenStateValue.copy(currencyRates = rates)
+                        fetchRatesIfNeeded(base, rates)
+                    }.launchIn(viewModelScope + Dispatchers.IO)
+            }
+        }
+    }
+
+    private suspend fun fetchRatesIfNeeded(base: String, rates: List<CurrencyRatesModel>) {
+        val timestamp = rates.minOfOrNull { it.timestamp } ?: 0L
+        val current = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+        val timeDif = timestamp + MIN_DELAY_REQUEST - current
+        if (rates.isEmpty() || timeDif < 0) {
+            repository.fetchLatestCurrency(base)
         }
     }
 

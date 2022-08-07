@@ -1,10 +1,7 @@
 package com.example.exchangeratestestapppublic
 
 import com.example.exchangeratestestapppublic.api.ExchangeApi
-import com.example.exchangeratestestapppublic.db.CurrenciesListDao
-import com.example.exchangeratestestapppublic.db.CurrenciesModel
-import com.example.exchangeratestestapppublic.db.CurrencyRatesDao
-import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
+import com.example.exchangeratestestapppublic.db.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -13,9 +10,9 @@ import kotlin.math.roundToInt
 class ExchangeRepository @Inject constructor(
     private val retrofit: ExchangeApi,
     private val currenciesDao: CurrencyRatesDao,
-    private val currenciesListDao: CurrenciesListDao
+    private val currenciesListDao: CurrenciesListDao,
+    private val db: CurrencyDatabase
 ) {
-
 
     suspend fun fetchLatestCurrency(base: String) {
         val response = retrofit.getLatestCurrency(
@@ -24,15 +21,18 @@ class ExchangeRepository @Inject constructor(
         )
         if (response.success != false) {
             response.rates?.let {
-                it.forEach { (quote, rate) ->
-                    val currencyRateModel = CurrencyRatesModel(
-                        timestamp = response.timestamp ?: 0,
-                        base = base,
-                        quote = quote,
-                        rate = (rate * 1000.0).roundToInt() / 1000.0,
-                        isQuoteFavorite = currenciesDao.getFavoriteField(quote) ?: false
-                    )
-                    currenciesDao.addCurrencyRates(currencyRatesModel = currencyRateModel)
+                db.runInTransaction {
+                    it.forEach { (quote, rate) ->
+                        val currencyRateModel = CurrencyRatesModel(
+                            timestamp = response.timestamp ?: 0,
+                            base = base,
+                            quote = quote,
+                            rate = (rate * 1000.0).roundToInt() / 1000.0,
+                            isQuoteFavorite = currenciesDao.getFavoriteField(quote) ?: false
+                        )
+
+                        currenciesDao.addCurrencyRates(currencyRatesModel = currencyRateModel)
+                    }
                 }
             }
         }

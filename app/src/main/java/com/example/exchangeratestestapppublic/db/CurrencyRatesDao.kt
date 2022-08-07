@@ -21,7 +21,7 @@ interface CurrencyRatesDao {
     suspend fun changeFavoriteField(isQuoteFavorite: Boolean, quote: String)
 
     @Query("select ${CurrencyRatesContract.CurrencyRatesColumn.IS_QUOTE_FAVORITE} from ${CurrencyRatesContract.CURRENCY_RATES_TABLE_NAME} where ${CurrencyRatesContract.CurrencyRatesColumn.QUOTE} = :quote")
-    suspend fun getFavoriteField(quote: String): Boolean?
+    fun getFavoriteField(quote: String): Boolean?
 
     @Query("select * from ${CurrencyRatesContract.CURRENCY_RATES_TABLE_NAME} where ${CurrencyRatesContract.CurrencyRatesColumn.BASE} = :base and ${CurrencyRatesContract.CurrencyRatesColumn.IS_QUOTE_FAVORITE} = 1 ORDER BY CASE WHEN :isAsc = 1 THEN quote END ASC, CASE WHEN :isAsc = 0 THEN quote END DESC")
     fun getFavoriteCurrencyRatesByQuote(
