@@ -45,9 +45,7 @@ class ExchangeViewModel @Inject constructor(
             try {
                 getCurrencyNames()
                 getRates()
-                mainScreenStateValue = mainScreenStateValue.copy(isLoading = true)
                 repository.fetchCurrencyNamesList()
-                mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
 
             } catch (e: Exception) {
                 mainScreenStateValue = mainScreenStateValue.copy(
@@ -86,8 +84,10 @@ class ExchangeViewModel @Inject constructor(
     fun changeChosenCurrency(currency: CurrenciesModel) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                mainScreenStateValue = mainScreenStateValue.copy(isLoading = true)
                 mainScreenStateValue = mainScreenStateValue.copy(chosenCurrency = currency.symbol)
                 getRates()
+                mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
                 getFavoriteRates()
             } catch (e: Exception) {
                 mainScreenStateValue = mainScreenStateValue.copy(

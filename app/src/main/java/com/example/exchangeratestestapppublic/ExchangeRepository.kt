@@ -2,7 +2,6 @@ package com.example.exchangeratestestapppublic
 
 import com.example.exchangeratestestapppublic.api.ExchangeApi
 import com.example.exchangeratestestapppublic.db.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -62,7 +61,6 @@ class ExchangeRepository @Inject constructor(
 
     suspend fun fetchCurrencyNamesList() {
         if (currenciesListDao.getCurrenciesList().isEmpty()) {
-            delay(10000)
             val response = retrofit.getCurrencyNamesList()
 
             if (response.success != false) {

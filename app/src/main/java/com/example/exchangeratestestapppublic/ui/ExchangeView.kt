@@ -1,7 +1,6 @@
 package com.example.exchangeratestestapppublic.ui
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
@@ -11,6 +10,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.ExchangeViewModel
@@ -51,9 +51,8 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
             BottomBar(viewModel = viewModel, state = mainScreenState)
         }
     ) {
-        if (mainScreenState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.padding(200.dp))
-        }
+        CircularProgressBar(isDisplayed = mainScreenState.isLoading)
+
         Card(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
@@ -83,5 +82,22 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
             }
         }
 
+    }
+}
+
+@Composable
+fun CircularProgressBar(isDisplayed: Boolean) {
+    if (isDisplayed) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .padding()
+                    .size(50.dp)
+            )
+        }
     }
 }
