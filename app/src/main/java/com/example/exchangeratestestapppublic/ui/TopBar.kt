@@ -21,6 +21,7 @@ import com.example.exchangeratestestapppublic.db.CurrenciesModel
 
 @Composable
 fun TopBar(
+    modifier: Modifier,
     items: List<CurrenciesModel>,
     onClick: (CurrenciesModel) -> Unit,
     onSortAscQuoteClick: () -> Unit,
@@ -28,7 +29,7 @@ fun TopBar(
     onSortAscRateClick: () -> Unit,
     onSortDescRateClick: () -> Unit
 ) {
-    Surface(elevation = 8.dp, modifier = Modifier) {
+    Surface(elevation = 8.dp, modifier = modifier) {
         DropdownMenu(
             items = items,
             onClick = onClick,
@@ -111,6 +112,7 @@ fun DropdownMenu(
                     }) {
                         Text(text = s.name)
                     }
+                    Divider(modifier = Modifier.padding(vertical = 16.dp))
                 }
             }
         }

@@ -28,6 +28,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
         scaffoldState = scaffoldState,
         topBar = {
             TopBar(
+                modifier = Modifier,
                 items = mainScreenState.currenciesList,
                 onClick = {
                     viewModel.changeChosenCurrency(it)
