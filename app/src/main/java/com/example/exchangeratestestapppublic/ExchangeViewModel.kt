@@ -37,6 +37,7 @@ class ExchangeViewModel @Inject constructor(
         mainScreenStateValue = mainScreenStateValue.copy(
             error = throwable
         )
+        mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
     }
     private val scope = viewModelScope + coroutineExceptionHandler + Dispatchers.IO
 
