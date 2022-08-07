@@ -17,7 +17,7 @@ data class MainScreenState(
     val currenciesList: List<CurrenciesModel> = emptyList(),
     val ordering: Ordering = Ordering.QUOTE_ASC,
     val favoritesRates: List<CurrencyRatesModel> = emptyList(),
-    val error: Exception? = null,
+    val error: Throwable? = null,
     val isLoading: Boolean = false
 )
 
@@ -33,6 +33,12 @@ class ExchangeViewModel @Inject constructor(
     private val _mainScreen = MutableStateFlow(MainScreenState())
     val mainScreen: StateFlow<MainScreenState> = _mainScreen
     private var ratesJob: Job? = null
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        mainScreenStateValue = mainScreenStateValue.copy(
+            error = throwable
+        )
+    }
+    private val scope = viewModelScope + coroutineExceptionHandler + Dispatchers.IO
 
     private var mainScreenStateValue: MainScreenState
         get() = _mainScreen.value
@@ -41,28 +47,21 @@ class ExchangeViewModel @Inject constructor(
         }
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                getCurrencyNames()
-                getRates()
-                repository.fetchCurrencyNamesList()
-
-            } catch (e: Exception) {
-                mainScreenStateValue = mainScreenStateValue.copy(
-                    error = e
-                )
-            }
+        scope.launch() {
+            getCurrencyNames()
+            getRates()
+            repository.fetchCurrencyNamesList()
         }
     }
 
     fun changeQuoteFavorite(isFavorite: Boolean, quote: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        scope.launch() {
             repository.changeFavoriteField(isFavorite, quote)
         }
     }
 
     fun changeOrder(ordering: Ordering) {
-        viewModelScope.launch(Dispatchers.IO) {
+        scope.launch() {
             mainScreenStateValue = mainScreenStateValue.copy(ordering = ordering)
             when (mainScreenStateValue.activeScreen) {
                 Screen.POPULAR -> getRates()
@@ -72,7 +71,7 @@ class ExchangeViewModel @Inject constructor(
     }
 
     fun changeScreen(screen: Screen) {
-        viewModelScope.launch(Dispatchers.IO) {
+        scope.launch() {
             mainScreenStateValue = mainScreenStateValue.copy(activeScreen = screen)
             when (screen) {
                 Screen.POPULAR -> getRates()
@@ -82,23 +81,17 @@ class ExchangeViewModel @Inject constructor(
     }
 
     fun changeChosenCurrency(currency: CurrenciesModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                mainScreenStateValue = mainScreenStateValue.copy(isLoading = true)
-                mainScreenStateValue = mainScreenStateValue.copy(chosenCurrency = currency.symbol)
-                getRates()
-                mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
-                getFavoriteRates()
-            } catch (e: Exception) {
-                mainScreenStateValue = mainScreenStateValue.copy(
-                    error = e
-                )
-            }
+        scope.launch() {
+            mainScreenStateValue = mainScreenStateValue.copy(isLoading = true)
+            mainScreenStateValue = mainScreenStateValue.copy(chosenCurrency = currency.symbol)
+            getRates()
+            mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
+            getFavoriteRates()
         }
     }
 
     private fun getCurrencyNames() {
-        viewModelScope.launch(Dispatchers.IO) {
+        scope.launch() {
             repository.getCurrenciesList().onEach { names ->
                 mainScreenStateValue = mainScreenStateValue.copy(currenciesList = names)
             }.collect()
@@ -116,7 +109,7 @@ class ExchangeViewModel @Inject constructor(
                     .onEach { rates ->
                         mainScreenStateValue = mainScreenStateValue.copy(currencyRates = rates)
                         fetchRatesIfNeeded(base, rates)
-                    }.launchIn(viewModelScope + Dispatchers.IO)
+                    }.launchIn(scope)
             }
         }
     }
@@ -138,7 +131,7 @@ class ExchangeViewModel @Inject constructor(
             ).distinctUntilChanged()
                 .onEach { rates ->
                     mainScreenStateValue = mainScreenStateValue.copy(favoritesRates = rates)
-                }.launchIn(viewModelScope)
+                }.launchIn(scope)
         }
     }
 }

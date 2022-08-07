@@ -2,8 +2,10 @@ package com.example.exchangeratestestapppublic.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -114,7 +116,10 @@ fun DropdownMenu(
         }
 
         Icon(
-            modifier = Modifier.clickable {
+            modifier = Modifier.clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(bounded = false, radius = 20.dp)
+            ) {
                 isSortingDialog = true
             },
             painter = painterResource(id = R.drawable.ic_baseline_sort),
