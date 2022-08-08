@@ -1,7 +1,8 @@
-package com.example.exchangeratestestapppublic
+package com.example.exchangeratestestapppublic.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.exchangeratestestapppublic.ExchangeRepository
 import com.example.exchangeratestestapppublic.db.CurrenciesModel
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import javax.inject.Inject
 data class MainScreenState(
     val activeScreen: Screen = Screen.POPULAR,
     val chosenCurrency: String? = null,
+    val chosenCurrencyName: String? = null,
     val currencyRates: List<CurrencyRatesModel> = emptyList(),
     val currenciesList: List<CurrenciesModel> = emptyList(),
     val ordering: Ordering = Ordering.QUOTE_ASC,
@@ -84,7 +86,10 @@ class ExchangeViewModel @Inject constructor(
     fun changeChosenCurrency(currency: CurrenciesModel) {
         scope.launch() {
             mainScreenStateValue = mainScreenStateValue.copy(isLoading = true)
-            mainScreenStateValue = mainScreenStateValue.copy(chosenCurrency = currency.symbol)
+            mainScreenStateValue = mainScreenStateValue.copy(
+                chosenCurrency = currency.symbol,
+                chosenCurrencyName = currency.name
+            )
             getRates()
             mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
             getFavoriteRates()

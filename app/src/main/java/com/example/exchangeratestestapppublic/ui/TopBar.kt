@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -21,6 +22,7 @@ import com.example.exchangeratestestapppublic.db.CurrenciesModel
 @Composable
 fun TopBar(
     modifier: Modifier,
+    mainScreenState: MainScreenState,
     items: List<CurrenciesModel>,
     onClick: (CurrenciesModel) -> Unit,
     onSortAscQuoteClick: () -> Unit,
@@ -31,6 +33,7 @@ fun TopBar(
     Surface(elevation = 8.dp, modifier = modifier) {
         DropdownMenu(
             items = items,
+            mainScreenState = mainScreenState,
             onClick = onClick,
             onSortAscQuoteClick = onSortAscQuoteClick,
             onSortDescQuoteClick = onSortDescQuoteClick,
@@ -43,6 +46,7 @@ fun TopBar(
 @Composable
 fun DropdownMenu(
     items: List<CurrenciesModel>,
+    mainScreenState: MainScreenState,
     onClick: (CurrenciesModel) -> Unit,
     onSortAscQuoteClick: () -> Unit,
     onSortDescQuoteClick: () -> Unit,
@@ -84,9 +88,15 @@ fun DropdownMenu(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                } else if (mainScreenState.chosenCurrencyName != null) {
+                    Text(
+                        text = "${mainScreenState.chosenCurrencyName}(${mainScreenState.chosenCurrency})",
+                        style = MaterialTheme.typography.h6,
+                        maxLines = 1
+                    )
                 } else {
                     Text(
-                        text = "Выбор валюты",
+                        text = stringResource(id = R.string.chose_currency_button),
                         style = MaterialTheme.typography.h6,
                         maxLines = 1
                     )
@@ -165,26 +175,26 @@ fun SortingDialog(
             Column(Modifier.padding(16.dp)) {
                 Text(
                     modifier = Modifier.clickable { onSortAscQuoteClick() },
-                    text = "Отсортировать названия валют по возрастанию",
+                    text = stringResource(id = R.string.sort_dialog_name_asc),
                     style = MaterialTheme.typography.h5
                 )
                 Divider(Modifier.padding(vertical = 8.dp))
                 Text(
                     modifier = Modifier.clickable { onSortDescQuoteClick() },
-                    text = "Отсортировать названия валют по убыванию",
+                    text = stringResource(id = R.string.sort_dialog_name_desc),
                     style = MaterialTheme.typography.h5
                 )
 
                 Divider(Modifier.padding(vertical = 8.dp))
                 Text(
                     modifier = Modifier.clickable { onSortAscRateClick() },
-                    text = "Отсортировать значения валют по возрастанию",
+                    text = stringResource(id = R.string.sort_dialog_value_asc),
                     style = MaterialTheme.typography.h5
                 )
                 Divider(Modifier.padding(vertical = 8.dp))
                 Text(
                     modifier = Modifier.clickable { onSortDescRateClick() },
-                    text = "Отсортировать значения валют по убыванию",
+                    text = stringResource(id = R.string.sort_dialog_value_desc),
                     style = MaterialTheme.typography.h5
                 )
             }

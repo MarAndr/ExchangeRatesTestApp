@@ -10,10 +10,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.exchangeratestestapppublic.ExchangeViewModel
-import com.example.exchangeratestestapppublic.MainScreenState
-import com.example.exchangeratestestapppublic.Screen
+import com.example.exchangeratestestapppublic.R
 
 @Composable
 fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
@@ -37,7 +36,10 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
                     .weight(0.5f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Популярное", style = MaterialTheme.typography.h5)
+                Text(
+                    text = stringResource(id = R.string.popular_bottom_menu),
+                    style = MaterialTheme.typography.h5
+                )
             }
 
             Divider(
@@ -59,7 +61,10 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
                     .weight(0.5f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Избранное", style = MaterialTheme.typography.h5)
+                Text(
+                    text = stringResource(id = R.string.favorite_bottom_menu),
+                    style = MaterialTheme.typography.h5
+                )
             }
         }
     }

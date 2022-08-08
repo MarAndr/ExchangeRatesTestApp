@@ -1,4 +1,4 @@
-package com.example.exchangeratestestapppublic
+package com.example.exchangeratestestapppublic.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.exchangeratestestapppublic.ui.ExchangeView
 import com.example.exchangeratestestapppublic.ui.theme.ExchangeRatesTestAppPublicTheme
 import dagger.hilt.android.AndroidEntryPoint
 

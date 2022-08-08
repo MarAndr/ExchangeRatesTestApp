@@ -8,8 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.exchangeratestestapppublic.MainScreenState
+import com.example.exchangeratestestapppublic.R
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 
 @Composable
@@ -26,7 +27,7 @@ fun FavoriteRatesScreen(
     ) {
         if (favoriteCurrencyRates.isEmpty() || mainScreenState.chosenCurrency == null) {
             Text(
-                text = "Список избранного пуст или вы не выбрали базовую валюту",
+                text = stringResource(id = R.string.favorite_screen_title),
                 style = MaterialTheme.typography.h5,
                 color = Color.Gray
             )

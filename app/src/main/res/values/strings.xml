@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">ExchangeRatesTestApp Public</string>
+    <string name="chose_currency_button">Выбор валюты</string>
+    <string name="sort_dialog_name_asc">Отсортировать названия валют по возрастанию</string>
+    <string name="sort_dialog_name_desc">Отсортировать названия валют по убыванию</string>
+    <string name="sort_dialog_value_asc">Отсортировать значения валют по возрастанию</string>
+    <string name="sort_dialog_value_desc">Отсортировать значения валют по убыванию</string>
+    <string name="unknown_error">Неизвестная ошибка, повторите позже</string>
+    <string name="popular_bottom_menu">Популярное</string>
+    <string name="favorite_bottom_menu">Избранное</string>
+    <string name="popular_screen_title">Выберите базовую валюту для получения списка валют</string>
+    <string name="favorite_screen_title">Список избранного пуст или вы не выбрали базовую валюту</string>
+
 </resources>

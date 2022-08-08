@@ -9,10 +9,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.exchangeratestestapppublic.ExchangeViewModel
-import com.example.exchangeratestestapppublic.Ordering
-import com.example.exchangeratestestapppublic.Screen
+import com.example.exchangeratestestapppublic.R
 import kotlinx.coroutines.launch
 
 @Composable
@@ -20,12 +19,14 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
     val mainScreenState = viewModel.mainScreen.collectAsState().value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val unknownErrorText = stringResource(id = R.string.unknown_error)
 
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
             TopBar(
                 modifier = Modifier,
+                mainScreenState = mainScreenState,
                 items = mainScreenState.currenciesList,
                 onClick = {
                     viewModel.changeChosenCurrency(it)
@@ -33,7 +34,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
                         scaffoldState.snackbarHostState.showSnackbar(
                             message = if (mainScreenState.error != null) {
                                 mainScreenState.error.message
-                                    ?: "Неизвестная ошибка, повторите позже"
+                                    ?: unknownErrorText
                             } else {
                                 "Вы выбрали ${it.name} в качестве базовой валюты"
                             }
