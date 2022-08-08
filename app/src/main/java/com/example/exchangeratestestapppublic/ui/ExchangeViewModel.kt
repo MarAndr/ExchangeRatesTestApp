@@ -32,8 +32,8 @@ class ExchangeViewModel @Inject constructor(
         val MIN_DELAY_REQUEST = TimeUnit.HOURS.toMillis(2)
     }
 
-    private val _mainScreen = MutableStateFlow(MainScreenState())
-    val mainScreen: StateFlow<MainScreenState> = _mainScreen
+    private val _mainScreenState = MutableStateFlow(MainScreenState())
+    val mainScreen: StateFlow<MainScreenState> = _mainScreenState
     private var ratesJob: Job? = null
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         mainScreenStateValue = mainScreenStateValue.copy(
@@ -44,9 +44,9 @@ class ExchangeViewModel @Inject constructor(
     private val scope = viewModelScope + coroutineExceptionHandler + Dispatchers.IO
 
     private var mainScreenStateValue: MainScreenState
-        get() = _mainScreen.value
+        get() = _mainScreenState.value
         set(value) {
-            _mainScreen.value = value
+            _mainScreenState.value = value
         }
 
     init {
