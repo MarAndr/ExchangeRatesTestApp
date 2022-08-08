@@ -20,11 +20,36 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class Module {
+class DatabaseModule {
+    @Provides
+    @Singleton
+    fun provideDatabase(context: Application): CurrencyDatabase {
+        return Room.databaseBuilder(
+            context,
+            CurrencyDatabase::class.java,
+            CurrencyDatabase.DB_NAME
+        ).build()
+    }
 
     @Provides
     @Singleton
-    fun bindRetrofit(httpClient: OkHttpClient): ExchangeApi {
+    fun provideCurrencyRatesDao(db: CurrencyDatabase): CurrencyRatesDao {
+        return db.currencyRatesDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCurrencyListDao(db: CurrencyDatabase): CurrenciesListDao {
+        return db.currenciesListDao()
+    }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+class NetworkModule() {
+    @Provides
+    @Singleton
+    fun provideRetrofit(httpClient: OkHttpClient): ExchangeApi {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.apilayer.com/")
             .client(httpClient)
@@ -35,7 +60,7 @@ class Module {
 
     @Provides
     @Singleton
-    fun bindClient(): OkHttpClient {
+    fun provideClient(): OkHttpClient {
         return OkHttpClient
             .Builder()
             .addNetworkInterceptor(HttpLoggingInterceptor().apply {
@@ -48,29 +73,7 @@ class Module {
 
     @Provides
     @Singleton
-    fun bindDatabase(context: Application): CurrencyDatabase {
-        return Room.databaseBuilder(
-            context,
-            CurrencyDatabase::class.java,
-            CurrencyDatabase.DB_NAME
-        ).build()
-    }
-
-    @Provides
-    @Singleton
-    fun bindCurrencyRatesDao(db: CurrencyDatabase): CurrencyRatesDao {
-        return db.currencyRatesDao()
-    }
-
-    @Provides
-    @Singleton
-    fun bindCurrencyListDao(db: CurrencyDatabase): CurrenciesListDao {
-        return db.currenciesListDao()
-    }
-
-    @Provides
-    @Singleton
-    fun bindRepository(
+    fun provideRepository(
         api: ExchangeApi,
         currencyRatesDao: CurrencyRatesDao,
         currenciesListDao: CurrenciesListDao,

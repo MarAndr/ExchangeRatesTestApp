@@ -13,8 +13,6 @@ import androidx.room.PrimaryKey
     ]
 )
 data class CurrencyRatesModel(
-//    @ColumnInfo(name = CurrencyContract.CurrencyRatesColumn.ID)
-//    val id: Long = 0,
     @ColumnInfo(name = CurrencyRatesContract.CurrencyRatesColumn.TIMESTAMP)
     val timestamp: Long,
     @ColumnInfo(name = CurrencyRatesContract.CurrencyRatesColumn.BASE)
