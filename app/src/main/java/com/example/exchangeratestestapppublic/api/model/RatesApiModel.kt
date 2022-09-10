@@ -1,8 +1,9 @@
 package com.example.exchangeratestestapppublic.api.model
 
+import com.example.exchangeratestestapppublic.domain.model.Symbol
 import java.util.Date
 
-data class LatestCurrencyResponse(
+data class RatesApiModel(
     val id: Long = 0,
     val success: Boolean,
     val timestamp: Long?,

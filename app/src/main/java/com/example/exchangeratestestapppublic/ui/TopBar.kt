@@ -3,10 +3,28 @@ package com.example.exchangeratestestapppublic.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -16,15 +34,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.exchangeratestestapppublic.R
-import com.example.exchangeratestestapppublic.db.CurrenciesModel
-
+import com.example.exchangeratestestapppublic.domain.model.NameModel
 
 @Composable
 fun TopBar(
     modifier: Modifier,
     mainScreenState: MainScreenState,
-    items: List<CurrenciesModel>,
-    onClick: (CurrenciesModel) -> Unit,
+    items: List<NameModel>,
+    onClick: (NameModel) -> Unit,
     onSortAscQuoteClick: () -> Unit,
     onSortDescQuoteClick: () -> Unit,
     onSortAscRateClick: () -> Unit,
@@ -45,9 +62,9 @@ fun TopBar(
 
 @Composable
 fun DropdownMenu(
-    items: List<CurrenciesModel>,
+    items: List<NameModel>,
     mainScreenState: MainScreenState,
-    onClick: (CurrenciesModel) -> Unit,
+    onClick: (NameModel) -> Unit,
     onSortAscQuoteClick: () -> Unit,
     onSortDescQuoteClick: () -> Unit,
     onSortAscRateClick: () -> Unit,

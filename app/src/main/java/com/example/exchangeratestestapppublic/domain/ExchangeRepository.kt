@@ -1,81 +1,78 @@
 package com.example.exchangeratestestapppublic.domain
 
 import com.example.exchangeratestestapppublic.api.ExchangeApi
-import com.example.exchangeratestestapppublic.api.model.Symbol
-import com.example.exchangeratestestapppublic.db.CurrenciesModel
-import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 import com.example.exchangeratestestapppublic.db.dao.CurrenciesListDao
 import com.example.exchangeratestestapppublic.db.dao.CurrencyRatesDao
+import com.example.exchangeratestestapppublic.domain.mapper.NamesDbMapper
+import com.example.exchangeratestestapppublic.domain.mapper.RatesDbMapper
+import com.example.exchangeratestestapppublic.domain.model.NameModel
+import com.example.exchangeratestestapppublic.domain.model.RatesModel
+import com.example.exchangeratestestapppublic.domain.model.Symbol
 import com.example.exchangeratestestapppublic.ui.Ordering
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.roundToInt
 
-@Singleton
-class ExchangeRepository @Inject constructor(
+@Singleton class ExchangeRepository @Inject constructor(
     private val retrofit: ExchangeApi,
     private val currenciesDao: CurrencyRatesDao,
     private val currenciesListDao: CurrenciesListDao,
+    private val namesDbMapper: NamesDbMapper,
+    private val ratesDbMapper: RatesDbMapper,
 ) {
 
-    suspend fun fetchLatestCurrency(base: String) {
+    suspend fun fetchLatestCurrency(base: Symbol) {
         val response = retrofit.getLatestCurrency(
-            base = base,
-            symbols = Symbol.values().joinToString(",")
+            base = base.toString(), symbols = Symbol.values().joinToString(",")
         )
-        if (response.success) {
-            response.rates?.let {
-                it.forEach { (quote, rate) ->
-                    val currencyRateModel = CurrencyRatesModel(
-                        timestamp = response.timestamp ?: 0,
-                        base = base,
-                        quote = quote.name,
-                        rate = (rate * 1000.0).roundToInt() / 1000.0,
-                        isQuoteFavorite = currenciesDao.getFavoriteField(quote.name) ?: false
-                    )
+        if (!response.success || response.rates == null) {
+            return
+        }
 
-                    currenciesDao.addCurrencyRates(currencyRatesModel = currencyRateModel)
-                }
-            }
+        response.rates.forEach { (quote, rate) ->
+            val ratesDbModel = ratesDbMapper.apiToDb(response, base, quote, rate)
+            currenciesDao.addCurrencyRates(currencyRatesModel = ratesDbModel)
         }
     }
 
-    fun getCurrencyRatesSorted(base: String, ordering: Ordering): Flow<List<CurrencyRatesModel>> {
+    fun getCurrencyRatesSorted(base: Symbol, ordering: Ordering): Flow<List<RatesModel>> {
         return when (ordering) {
-            Ordering.QUOTE_ASC -> currenciesDao.getCurrencyRatesOrderByQuote(base, true)
-            Ordering.QUOTE_DESC -> currenciesDao.getCurrencyRatesOrderByQuote(base, false)
-            Ordering.RATE_ASC -> currenciesDao.getCurrencyRatesOrderByRate(base, true)
-            Ordering.RATE_DESC -> currenciesDao.getCurrencyRatesOrderByRate(base, false)
-        }
+            Ordering.QUOTE_ASC -> currenciesDao.getCurrencyRatesOrderByQuote(base.toString(), true)
+            Ordering.QUOTE_DESC -> currenciesDao.getCurrencyRatesOrderByQuote(base.toString(), false)
+            Ordering.RATE_ASC -> currenciesDao.getCurrencyRatesOrderByRate(base.toString(), true)
+            Ordering.RATE_DESC -> currenciesDao.getCurrencyRatesOrderByRate(base.toString(), false)
+        }.map { list -> list.map(ratesDbMapper::dbToDomainModel) }
     }
 
-    fun getFavoriteCurrencyRates(base: String, ordering: Ordering): Flow<List<CurrencyRatesModel>> {
+    fun getFavoriteCurrencyRates(base: Symbol, ordering: Ordering): Flow<List<RatesModel>> {
         return when (ordering) {
-            Ordering.QUOTE_ASC -> currenciesDao.getFavoriteCurrencyRatesByQuote(base, true)
-            Ordering.QUOTE_DESC -> currenciesDao.getFavoriteCurrencyRatesByQuote(base, false)
-            Ordering.RATE_ASC -> currenciesDao.getFavoriteCurrencyRatesByRates(base, true)
-            Ordering.RATE_DESC -> currenciesDao.getFavoriteCurrencyRatesByRates(base, false)
-        }
+            Ordering.QUOTE_ASC -> currenciesDao.getFavoriteCurrencyRatesByQuote(base.toString(), true)
+            Ordering.QUOTE_DESC -> currenciesDao.getFavoriteCurrencyRatesByQuote(base.toString(), false)
+            Ordering.RATE_ASC -> currenciesDao.getFavoriteCurrencyRatesByRates(base.toString(), true)
+            Ordering.RATE_DESC -> currenciesDao.getFavoriteCurrencyRatesByRates(base.toString(), false)
+        }.map { list -> list.map(ratesDbMapper::dbToDomainModel) }
     }
 
-    fun getCurrenciesList(): Flow<List<CurrenciesModel>> {
-        return currenciesListDao.getCurrencies()
+    fun getCurrenciesList(): Flow<List<NameModel>> {
+        return currenciesListDao.getCurrencies().map { currencies ->
+            currencies.map(namesDbMapper::mapToDomain)
+        }
     }
 
     suspend fun fetchCurrencyNamesList() {
-        if (currenciesListDao.getCurrenciesList().isEmpty()) {
-            val response = retrofit.getCurrencyNamesList()
+        if (currenciesListDao.getCurrenciesList().isNotEmpty()) {
+            return
+        }
 
-            if (response.success) {
-                response.symbols?.let {
-                    it.forEach { (symbol, name) ->
-                        val currencyNamesList = CurrenciesModel(id = 0, symbol = symbol.name, name = name)
-                        currenciesListDao.addCurrenciesList(currencyNamesList)
-                    }
+        val response = retrofit.getCurrencyNamesList()
+        if (!response.success || response.symbols == null) {
+            return
+        }
 
-                }
-            }
+        response.symbols.forEach { (symbol, name) ->
+            val currencyNamesList = namesDbMapper.mapToDb(symbol, name)
+            currenciesListDao.addCurrenciesList(currencyNamesList)
         }
     }
 

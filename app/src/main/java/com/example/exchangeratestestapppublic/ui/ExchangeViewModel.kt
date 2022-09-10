@@ -4,8 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.exchangeratestestapppublic.domain.ExchangeRepository
-import com.example.exchangeratestestapppublic.db.CurrenciesModel
-import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
+import com.example.exchangeratestestapppublic.domain.model.NameModel
+import com.example.exchangeratestestapppublic.domain.model.RatesModel
+import com.example.exchangeratestestapppublic.domain.model.Symbol
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -24,18 +25,17 @@ import javax.inject.Inject
 
 data class MainScreenState(
     val activeScreen: Screen = Screen.Popular,
-    val chosenCurrency: String? = null,
+    val chosenCurrency: Symbol? = null,
     val chosenCurrencyName: String? = null,
-    val currencyRates: List<CurrencyRatesModel> = emptyList(),
-    val currenciesList: List<CurrenciesModel> = emptyList(),
+    val currencyRates: List<RatesModel> = emptyList(),
+    val currenciesList: List<NameModel> = emptyList(),
     val ordering: Ordering = Ordering.QUOTE_ASC,
-    val favoritesRates: List<CurrencyRatesModel> = emptyList(),
+    val favoritesRates: List<RatesModel> = emptyList(),
     val error: Throwable? = null,
     val isLoading: Boolean = false
 )
 
-@HiltViewModel
-class ExchangeViewModel @Inject constructor(
+@HiltViewModel class ExchangeViewModel @Inject constructor(
     private val repository: ExchangeRepository
 ) : ViewModel() {
 
@@ -46,7 +46,9 @@ class ExchangeViewModel @Inject constructor(
 
     private val _mainScreenState = MutableStateFlow(MainScreenState())
     val mainScreen: StateFlow<MainScreenState> = _mainScreenState
+
     private var ratesJob: Job? = null
+
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         mainScreenStateValue = mainScreenStateValue.copy(error = throwable)
         Log.e("ExchangeViewModel", "Error: $throwable", throwable)
@@ -94,12 +96,11 @@ class ExchangeViewModel @Inject constructor(
         }
     }
 
-    fun changeChosenCurrency(currency: CurrenciesModel) {
+    fun changeChosenCurrency(currency: NameModel) {
         scope.launch() {
             mainScreenStateValue = mainScreenStateValue.copy(isLoading = true)
             mainScreenStateValue = mainScreenStateValue.copy(
-                chosenCurrency = currency.symbol,
-                chosenCurrencyName = currency.name
+                chosenCurrency = currency.symbol, chosenCurrencyName = currency.name
             )
             getRates()
             mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
@@ -120,18 +121,16 @@ class ExchangeViewModel @Inject constructor(
             viewModelScope.launch {
                 ratesJob?.cancelAndJoin()
                 ratesJob = repository.getCurrencyRatesSorted(
-                    base = base,
-                    ordering = mainScreenStateValue.ordering
-                ).distinctUntilChanged()
-                    .onEach { rates ->
-                        mainScreenStateValue = mainScreenStateValue.copy(currencyRates = rates)
-                        fetchRatesIfNeeded(base, rates)
-                    }.launchIn(scope)
+                    base = base, ordering = mainScreenStateValue.ordering
+                ).distinctUntilChanged().onEach { rates ->
+                    mainScreenStateValue = mainScreenStateValue.copy(currencyRates = rates)
+                    fetchRatesIfNeeded(base, rates)
+                }.launchIn(scope)
             }
         }
     }
 
-    private suspend fun fetchRatesIfNeeded(base: String, rates: List<CurrencyRatesModel>) {
+    private suspend fun fetchRatesIfNeeded(base: Symbol, rates: List<RatesModel>) {
         val timestamp = rates.minOfOrNull { it.timestamp } ?: 0L
         val current = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
         val timeDif = timestamp + MIN_DELAY_REQUEST - current
@@ -143,19 +142,13 @@ class ExchangeViewModel @Inject constructor(
     private fun getFavoriteRates() {
         mainScreenStateValue.chosenCurrency?.let { base ->
             repository.getFavoriteCurrencyRates(
-                base = base,
-                ordering = mainScreenStateValue.ordering
-            ).distinctUntilChanged()
-                .onEach { rates ->
-                    mainScreenStateValue = mainScreenStateValue.copy(favoritesRates = rates)
-                }.launchIn(scope)
+                base = base, ordering = mainScreenStateValue.ordering
+            ).distinctUntilChanged().onEach { rates ->
+                mainScreenStateValue = mainScreenStateValue.copy(favoritesRates = rates)
+            }.launchIn(scope)
         }
     }
 }
 
-enum class Ordering {
-    QUOTE_ASC,
-    QUOTE_DESC,
-    RATE_DESC,
-    RATE_ASC,
+enum class Ordering { QUOTE_ASC, QUOTE_DESC, RATE_DESC, RATE_ASC,
 }

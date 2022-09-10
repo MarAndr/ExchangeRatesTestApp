@@ -1,4 +1,4 @@
-package com.example.exchangeratestestapppublic.db
+package com.example.exchangeratestestapppublic.db.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
         "quote",
     ]
 )
-data class CurrencyRatesModel(
+data class RatesDbModel(
     val timestamp: Long,
     val base: String,
     val quote: String,
@@ -18,7 +18,7 @@ data class CurrencyRatesModel(
 )
 
 @Entity
-data class CurrenciesModel(
+data class NamesDbModel(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val symbol: String,
