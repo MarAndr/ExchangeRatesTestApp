@@ -19,4 +19,6 @@ enum class Symbol {
     INR,
     PLN,
     AMD,
+
+    Unknown;
 }

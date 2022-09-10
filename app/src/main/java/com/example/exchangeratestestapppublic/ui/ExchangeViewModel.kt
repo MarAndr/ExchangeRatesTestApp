@@ -1,5 +1,6 @@
 package com.example.exchangeratestestapppublic.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.exchangeratestestapppublic.ExchangeRepository
@@ -47,9 +48,8 @@ class ExchangeViewModel @Inject constructor(
     val mainScreen: StateFlow<MainScreenState> = _mainScreenState
     private var ratesJob: Job? = null
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        mainScreenStateValue = mainScreenStateValue.copy(
-            error = throwable
-        )
+        mainScreenStateValue = mainScreenStateValue.copy(error = throwable)
+        Log.e("ExchangeViewModel", "Error: $throwable", throwable)
         mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
     }
     private val scope = viewModelScope + coroutineExceptionHandler + Dispatchers.IO

@@ -3,9 +3,12 @@ package com.example.exchangeratestestapppublic.di
 import android.app.Application
 import androidx.room.Room
 import com.example.exchangeratestestapppublic.api.ExchangeApi
+import com.example.exchangeratestestapppublic.api.model.Symbol
+import com.example.exchangeratestestapppublic.api.serializer.SymbolDeserializer
 import com.example.exchangeratestestapppublic.db.CurrencyDatabase
 import com.example.exchangeratestestapppublic.db.dao.CurrenciesListDao
 import com.example.exchangeratestestapppublic.db.dao.CurrencyRatesDao
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,11 +53,22 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(httpClient: OkHttpClient): ExchangeApi {
+    fun provideGsonFactory(): GsonConverterFactory {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(Symbol::class.java, SymbolDeserializer())
+            .create()
+
+        return GsonConverterFactory
+            .create(gson)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(httpClient: OkHttpClient, gsonConverterFactory: GsonConverterFactory): ExchangeApi {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.apilayer.com/")
             .client(httpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(gsonConverterFactory)
             .build()
         return retrofit.create()
     }
