@@ -1,6 +1,6 @@
 package com.example.exchangeratestestapppublic.api
 
-import java.util.*
+import java.util.Date
 
 data class LatestCurrencyResponse(
     val id: Long = 0,

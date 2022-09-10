@@ -1,17 +1,21 @@
 package com.example.exchangeratestestapppublic
 
 import com.example.exchangeratestestapppublic.api.ExchangeApi
-import com.example.exchangeratestestapppublic.db.*
+import com.example.exchangeratestestapppublic.db.CurrenciesModel
+import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
+import com.example.exchangeratestestapppublic.db.dao.CurrenciesListDao
+import com.example.exchangeratestestapppublic.db.dao.CurrencyRatesDao
 import com.example.exchangeratestestapppublic.ui.Ordering
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.roundToInt
 
+@Singleton
 class ExchangeRepository @Inject constructor(
     private val retrofit: ExchangeApi,
     private val currenciesDao: CurrencyRatesDao,
     private val currenciesListDao: CurrenciesListDao,
-    private val db: CurrencyDatabase
 ) {
 
     suspend fun fetchLatestCurrency(base: String) {
@@ -21,18 +25,16 @@ class ExchangeRepository @Inject constructor(
         )
         if (response.success != false) {
             response.rates?.let {
-                db.runInTransaction {
-                    it.forEach { (quote, rate) ->
-                        val currencyRateModel = CurrencyRatesModel(
-                            timestamp = response.timestamp ?: 0,
-                            base = base,
-                            quote = quote,
-                            rate = (rate * 1000.0).roundToInt() / 1000.0,
-                            isQuoteFavorite = currenciesDao.getFavoriteField(quote) ?: false
-                        )
+                it.forEach { (quote, rate) ->
+                    val currencyRateModel = CurrencyRatesModel(
+                        timestamp = response.timestamp ?: 0,
+                        base = base,
+                        quote = quote,
+                        rate = (rate * 1000.0).roundToInt() / 1000.0,
+                        isQuoteFavorite = currenciesDao.getFavoriteField(quote) ?: false
+                    )
 
-                        currenciesDao.addCurrencyRates(currencyRatesModel = currencyRateModel)
-                    }
+                    currenciesDao.addCurrencyRates(currencyRatesModel = currencyRateModel)
                 }
             }
         }
@@ -103,6 +105,7 @@ enum class Symbols {
     AMD;
 
     companion object {
+
         fun getSymbolsString() = values().joinToString(",")
     }
 }
