@@ -1,5 +1,7 @@
 package com.example.exchangeratestestapppublic.api
 
+import com.example.exchangeratestestapppublic.api.model.CurrenciesNameResponse
+import com.example.exchangeratestestapppublic.api.model.LatestCurrencyResponse
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query

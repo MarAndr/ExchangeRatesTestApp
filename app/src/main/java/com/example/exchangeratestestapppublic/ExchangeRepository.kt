@@ -1,6 +1,7 @@
 package com.example.exchangeratestestapppublic
 
 import com.example.exchangeratestestapppublic.api.ExchangeApi
+import com.example.exchangeratestestapppublic.api.model.Symbol
 import com.example.exchangeratestestapppublic.db.CurrenciesModel
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 import com.example.exchangeratestestapppublic.db.dao.CurrenciesListDao
@@ -20,18 +21,17 @@ class ExchangeRepository @Inject constructor(
 
     suspend fun fetchLatestCurrency(base: String) {
         val response = retrofit.getLatestCurrency(
-            base = base,
-            symbols = Symbols.getSymbolsString()
+            base = base, symbols = Symbol.values().joinToString(",")
         )
-        if (response.success != false) {
+        if (response.success) {
             response.rates?.let {
                 it.forEach { (quote, rate) ->
                     val currencyRateModel = CurrencyRatesModel(
                         timestamp = response.timestamp ?: 0,
                         base = base,
-                        quote = quote,
+                        quote = quote.name,
                         rate = (rate * 1000.0).roundToInt() / 1000.0,
-                        isQuoteFavorite = currenciesDao.getFavoriteField(quote) ?: false
+                        isQuoteFavorite = currenciesDao.getFavoriteField(quote.name) ?: false
                     )
 
                     currenciesDao.addCurrencyRates(currencyRatesModel = currencyRateModel)
@@ -66,11 +66,10 @@ class ExchangeRepository @Inject constructor(
         if (currenciesListDao.getCurrenciesList().isEmpty()) {
             val response = retrofit.getCurrencyNamesList()
 
-            if (response.success != false) {
+            if (response.success) {
                 response.symbols?.let {
                     it.forEach { (symbol, name) ->
-                        val currencyNamesList =
-                            CurrenciesModel(id = 0, symbol = symbol, name = name)
+                        val currencyNamesList = CurrenciesModel(id = 0, symbol = symbol.name, name = name)
                         currenciesListDao.addCurrenciesList(currencyNamesList)
                     }
 
@@ -81,31 +80,5 @@ class ExchangeRepository @Inject constructor(
 
     suspend fun changeFavoriteField(favorite: Boolean, quote: String) {
         currenciesDao.changeFavoriteField(isQuoteFavorite = favorite, quote = quote)
-    }
-}
-
-enum class Symbols {
-    USD,
-    EUR,
-    GBP,
-    CNY,
-    CHF,
-    JPY,
-    UAH,
-    RUB,
-    SEK,
-    TRY,
-    SGD,
-    CAD,
-    DKK,
-    KRW,
-    BRL,
-    INR,
-    PLN,
-    AMD;
-
-    companion object {
-
-        fun getSymbolsString() = values().joinToString(",")
     }
 }
