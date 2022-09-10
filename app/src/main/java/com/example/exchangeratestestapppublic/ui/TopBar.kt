@@ -10,10 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.exchangeratestestapppublic.R
 import com.example.exchangeratestestapppublic.domain.model.NameModel
 
@@ -120,25 +122,29 @@ fun DropdownMenu(
                 }
             }
 
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colors.background
-                    )
-            ) {
-                items.forEachIndexed { index, s ->
-                    DropdownMenuItem(onClick = {
-                        selectedIndex = index
-                        expanded = false
-                        onClick(items[index])
-                    }) {
-                        Text(text = s.name, style = MaterialTheme.typography.body1)
+            if (expanded) {
+                Dialog(
+                    onDismissRequest = { expanded = false },
+                    properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true),
+                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                MaterialTheme.colors.background
+                            )
+                    ) {
+                        itemsIndexed(items) { index, s ->
+                            DropdownMenuItem(onClick = {
+                                selectedIndex = index
+                                expanded = false
+                                onClick(items[index])
+                            }) {
+                                Text(text = s.name, style = MaterialTheme.typography.body1)
+                            }
+                            Divider(modifier = Modifier.padding(vertical = 16.dp))
+                        }
                     }
-                    Divider(modifier = Modifier.padding(vertical = 16.dp))
                 }
             }
         }
