@@ -60,7 +60,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
             elevation = 4.dp
         ) {
             when (mainScreenState.activeScreen) {
-                Screen.POPULAR -> PopularRatesScreen(
+                Screen.Popular -> PopularRatesScreen(
                     viewModel = viewModel,
                     currencyRates = mainScreenState.currencyRates
                 ) { isFavorite, quote ->
@@ -74,7 +74,7 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
                         )
                     }
                 }
-                Screen.FAVORITE -> FavoriteRatesScreen(
+                Screen.Favorite -> FavoriteRatesScreen(
                     favoriteCurrencyRates = mainScreenState.favoritesRates,
                     mainScreenState = mainScreenState
                 )

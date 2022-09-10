@@ -25,13 +25,13 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
             Box(
                 modifier = Modifier
                     .background(
-                        color = if (state.activeScreen == Screen.POPULAR) {
+                        color = if (state.activeScreen == Screen.Popular) {
                             MaterialTheme.colors.secondary
                         } else MaterialTheme.colors.background
                     )
                     .fillMaxHeight()
                     .clickable {
-                        viewModel.changeScreen(Screen.POPULAR)
+                        viewModel.changeScreen(Screen.Popular)
                     }
                     .weight(0.5f),
                 contentAlignment = Alignment.Center
@@ -50,13 +50,13 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
             Box(
                 modifier = Modifier
                     .background(
-                        color = if (state.activeScreen == Screen.FAVORITE) {
+                        color = if (state.activeScreen == Screen.Favorite) {
                             MaterialTheme.colors.secondary
                         } else MaterialTheme.colors.background
                     )
                     .fillMaxHeight()
                     .clickable {
-                        viewModel.changeScreen(Screen.FAVORITE)
+                        viewModel.changeScreen(Screen.Favorite)
                     }
                     .weight(0.5f),
                 contentAlignment = Alignment.Center
