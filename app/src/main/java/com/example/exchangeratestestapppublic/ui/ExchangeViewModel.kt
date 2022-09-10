@@ -3,7 +3,7 @@ package com.example.exchangeratestestapppublic.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.exchangeratestestapppublic.ExchangeRepository
+import com.example.exchangeratestestapppublic.domain.ExchangeRepository
 import com.example.exchangeratestestapppublic.db.CurrenciesModel
 import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
 import dagger.hilt.android.lifecycle.HiltViewModel

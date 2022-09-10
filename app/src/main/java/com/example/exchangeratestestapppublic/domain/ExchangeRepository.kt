@@ -1,4 +1,4 @@
-package com.example.exchangeratestestapppublic
+package com.example.exchangeratestestapppublic.domain
 
 import com.example.exchangeratestestapppublic.api.ExchangeApi
 import com.example.exchangeratestestapppublic.api.model.Symbol
@@ -21,7 +21,8 @@ class ExchangeRepository @Inject constructor(
 
     suspend fun fetchLatestCurrency(base: String) {
         val response = retrofit.getLatestCurrency(
-            base = base, symbols = Symbol.values().joinToString(",")
+            base = base,
+            symbols = Symbol.values().joinToString(",")
         )
         if (response.success) {
             response.rates?.let {
