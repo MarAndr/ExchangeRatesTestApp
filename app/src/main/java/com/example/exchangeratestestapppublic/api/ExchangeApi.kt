@@ -14,6 +14,6 @@ interface ExchangeApi {
     ): LatestCurrencyResponse
 
     @GET("exchangerates_data/symbols")
-    @Headers("apikey: 6j9BqM9zJ06Ceyb2CZK8WGHFmDLVgwDT")
+    @Headers("apikey: 6j9BqM9zJ06Ceyb2CZK8WGHFmDLVgwDT") // todo секретные ключи лучше не хранить в коде открыто
     suspend fun getCurrencyNamesList(): CurrenciesNameResponse
 }
