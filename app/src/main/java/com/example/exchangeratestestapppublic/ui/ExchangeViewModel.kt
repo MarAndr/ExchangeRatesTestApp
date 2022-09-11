@@ -10,7 +10,6 @@ import com.example.exchangeratestestapppublic.domain.model.Symbol
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -102,18 +101,21 @@ data class MainScreenState(
         }
     }
 
-    private fun getRates() {
-        _mainScreenState.value.chosenCurrency?.let { base ->
-            viewModelScope.launch {
-                ratesJob?.cancelAndJoin()
-                ratesJob = repository.getCurrencyRatesSorted(
-                    base = base, ordering = _mainScreenState.value.ordering
-                ).distinctUntilChanged().onEach { rates ->
-                    _mainScreenState.value = _mainScreenState.value.copy(currencyRates = rates)
-                    fetchRatesIfNeeded(base, rates)
-                }.launchIn(scope)
+    private fun getRates() = scope.launch {
+        val chosenCurrency = _mainScreenState.value.chosenCurrency ?: return@launch
+
+        ratesJob?.cancel()
+
+        ratesJob = repository.getCurrencyRatesSorted(
+            base = chosenCurrency,
+            ordering = _mainScreenState.value.ordering
+        )
+            .distinctUntilChanged()
+            .onEach { rates ->
+                _mainScreenState.value = _mainScreenState.value.copy(currencyRates = rates)
+                fetchRatesIfNeeded(chosenCurrency, rates)
             }
-        }
+            .launchIn(scope)
     }
 
     private suspend fun fetchRatesIfNeeded(base: Symbol, rates: List<RatesModel>) {
@@ -125,14 +127,14 @@ data class MainScreenState(
         }
     }
 
-    private fun getFavoriteRates() {
-        _mainScreenState.value.chosenCurrency?.let { base ->
-            repository.getFavoriteCurrencyRates(
-                base = base, ordering = _mainScreenState.value.ordering
-            ).distinctUntilChanged().onEach { rates ->
+    private fun getFavoriteRates() = scope.launch {
+        val chosenCurrency = _mainScreenState.value.chosenCurrency ?: return@launch
+
+        repository.getFavoriteCurrencyRates(base = chosenCurrency, ordering = _mainScreenState.value.ordering)
+            .distinctUntilChanged()
+            .collect { rates ->
                 _mainScreenState.value = _mainScreenState.value.copy(favoritesRates = rates)
-            }.launchIn(scope)
-        }
+            }
     }
 }
 
