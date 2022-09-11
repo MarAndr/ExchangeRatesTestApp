@@ -4,8 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.collectAsState
 import com.example.exchangeratestestapppublic.ui.theme.ExchangeRatesTestAppPublicTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,17 +17,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val mainScreenState = viewModel.mainScreen.collectAsState().value
+
             ExchangeRatesTestAppPublicTheme {
-                ExchangeView(viewModel = viewModel)
+                ExchangeView(mainScreenState, viewModel = viewModel)
             }
         }
 
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ExchangeRatesTestAppPublicTheme {
     }
 }

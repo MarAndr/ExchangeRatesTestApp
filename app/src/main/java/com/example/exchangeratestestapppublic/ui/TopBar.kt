@@ -41,7 +41,7 @@ import com.example.exchangeratestestapppublic.domain.model.NameModel
 @Composable
 fun TopBar(
     modifier: Modifier,
-    mainScreenState: MainScreenState,
+    state: MainScreenState,
     items: List<NameModel>,
     onClick: (NameModel) -> Unit,
     onSortAscQuoteClick: () -> Unit,
@@ -52,7 +52,7 @@ fun TopBar(
     Surface(elevation = 8.dp, modifier = modifier) {
         DropdownMenu(
             items = items,
-            mainScreenState = mainScreenState,
+            state = state,
             onClick = onClick,
             onSortAscQuoteClick = onSortAscQuoteClick,
             onSortDescQuoteClick = onSortDescQuoteClick,
@@ -65,7 +65,7 @@ fun TopBar(
 @Composable
 fun DropdownMenu(
     items: List<NameModel>,
-    mainScreenState: MainScreenState,
+    state: MainScreenState,
     onClick: (NameModel) -> Unit,
     onSortAscQuoteClick: () -> Unit,
     onSortDescQuoteClick: () -> Unit,
@@ -107,9 +107,9 @@ fun DropdownMenu(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                } else if (mainScreenState.chosenCurrencyName != null) {
+                } else if (state.chosenCurrencyName != null) {
                     Text(
-                        text = "${mainScreenState.chosenCurrencyName}(${mainScreenState.chosenCurrency})",
+                        text = "${state.chosenCurrencyName}(${state.chosenCurrency})",
                         style = MaterialTheme.typography.h6,
                         maxLines = 1
                     )

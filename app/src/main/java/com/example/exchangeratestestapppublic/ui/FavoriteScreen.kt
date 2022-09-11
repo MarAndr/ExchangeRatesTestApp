@@ -23,7 +23,7 @@ import com.example.exchangeratestestapppublic.domain.model.RatesModel
 @Composable
 fun FavoriteRatesScreen(
     favoriteCurrencyRates: List<RatesModel>,
-    mainScreenState: MainScreenState
+    state: MainScreenState
 ) {
     Column(
         Modifier
@@ -32,7 +32,7 @@ fun FavoriteRatesScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (favoriteCurrencyRates.isEmpty() || mainScreenState.chosenCurrency == null) {
+        if (favoriteCurrencyRates.isEmpty() || state.chosenCurrency == null) {
             Text(
                 text = stringResource(id = R.string.favorite_screen_title),
                 style = MaterialTheme.typography.h5,

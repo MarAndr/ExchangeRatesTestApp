@@ -26,7 +26,7 @@ import com.example.exchangeratestestapppublic.domain.model.RatesModel
 @Composable
 fun PopularRatesScreen(
     currencyRates: List<RatesModel>,
-    viewModel: ExchangeViewModel,
+    viewModel: ExchangeViewModel?,
     onStarClick: (Boolean, String) -> Unit
 ) {
     Column(
@@ -66,7 +66,7 @@ fun PopularRatesScreen(
                         Spacer(modifier = Modifier.width(32.dp))
                         Icon(
                             modifier = Modifier.clickable {
-                                viewModel.changeQuoteFavorite(
+                                viewModel?.changeQuoteFavorite(
                                     isFavorite = !isFavorite,
                                     quote = currencyRatesModel.quote.toString()
                                 )
