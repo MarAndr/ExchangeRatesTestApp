@@ -1,7 +1,14 @@
 package com.example.exchangeratestestapppublic.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -12,14 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.R
-import com.example.exchangeratestestapppublic.db.CurrencyRatesModel
+import com.example.exchangeratestestapppublic.domain.model.RatesModel
+import com.example.exchangeratestestapppublic.domain.model.Symbol
 
 @Composable
 fun PopularRatesScreen(
-    currencyRates: List<CurrencyRatesModel>,
-    viewModel: ExchangeViewModel,
+    currencyRates: List<RatesModel>,
+    viewModel: ExchangeViewModel?,
     onStarClick: (Boolean, String) -> Unit
 ) {
     Column(
@@ -29,6 +38,7 @@ fun PopularRatesScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // todo: Использовать LazyColumn вместо forEach
         if (currencyRates.isEmpty()) {
             Text(
                 text = stringResource(id = R.string.popular_screen_title),
@@ -45,12 +55,15 @@ fun PopularRatesScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = currencyRatesModel.base, style = MaterialTheme.typography.h5)
+                    Text(text = currencyRatesModel.base.value, style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(text = "/", style = MaterialTheme.typography.h5)
+
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(text = currencyRatesModel.quote, style = MaterialTheme.typography.h5)
+
+                    Text(text = currencyRatesModel.quote.value, style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.weight(1f))
+
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = currencyRatesModel.rate.toString(),
@@ -59,11 +72,11 @@ fun PopularRatesScreen(
                         Spacer(modifier = Modifier.width(32.dp))
                         Icon(
                             modifier = Modifier.clickable {
-                                viewModel.changeQuoteFavorite(
+                                viewModel?.changeQuoteFavorite(
                                     isFavorite = !isFavorite,
-                                    quote = currencyRatesModel.quote
+                                    quote = currencyRatesModel.quote.value
                                 )
-                                onStarClick(isFavorite, currencyRatesModel.quote)
+                                onStarClick(isFavorite, currencyRatesModel.quote.value)
                             },
                             painter = icon,
                             contentDescription = ""
@@ -76,5 +89,29 @@ fun PopularRatesScreen(
             }
         }
     }
+}
 
+@Preview(showBackground = true)
+@Composable
+private fun PreviewPopularRatesScreen() {
+    PopularRatesScreen(
+        currencyRates = listOf(
+            RatesModel(
+                base = Symbol.EUR,
+                quote = Symbol.USD,
+                rate = 1.2,
+                isQuoteFavorite = false,
+                timestamp = 0L,
+            ),
+            RatesModel(
+                base = Symbol.EUR,
+                quote = Symbol.GBP,
+                rate = 0.9,
+                isQuoteFavorite = true,
+                timestamp = 0L,
+            )
+        ),
+        viewModel = null,
+        onStarClick = { _, _ -> }
+    )
 }

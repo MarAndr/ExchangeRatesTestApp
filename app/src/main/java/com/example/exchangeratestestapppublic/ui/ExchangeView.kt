@@ -1,68 +1,69 @@
 package com.example.exchangeratestestapppublic.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.R
+import com.example.exchangeratestestapppublic.ui.theme.ExchangeRatesTestAppPublicTheme
 import kotlinx.coroutines.launch
 
 @Composable
-fun ExchangeView(viewModel: ExchangeViewModel) {
-    val mainScreenState = viewModel.mainScreen.collectAsState().value
+fun ExchangeView(state: MainScreenState, viewModel: ExchangeViewModel?) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val unknownErrorText = stringResource(id = R.string.unknown_error)
 
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = {
-            TopBar(
-                modifier = Modifier,
-                mainScreenState = mainScreenState,
-                items = mainScreenState.currenciesList,
-                onClick = {
-                    viewModel.changeChosenCurrency(it)
-                    scope.launch {
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            message = if (mainScreenState.error != null) {
-                                mainScreenState.error.message
-                                    ?: unknownErrorText
-                            } else {
-                                "Вы выбрали ${it.name} в качестве базовой валюты"
-                            }
-                        )
-                    }
-                },
-                onSortDescRateClick = { viewModel.changeOrder(Ordering.RATE_DESC) },
-                onSortAscRateClick = { viewModel.changeOrder(Ordering.RATE_ASC) },
-                onSortAscQuoteClick = { viewModel.changeOrder(Ordering.QUOTE_ASC) },
-                onSortDescQuoteClick = { viewModel.changeOrder(Ordering.QUOTE_DESC) })
-        },
-        bottomBar = {
-            BottomBar(viewModel = viewModel, state = mainScreenState)
-        }
-    ) {
-        CircularProgressBar(isDisplayed = mainScreenState.isLoading)
+    Scaffold(scaffoldState = scaffoldState, topBar = {
+        TopBar(modifier = Modifier,
+            state = state,
+            items = state.currenciesList,
+            onClick = {
+                viewModel?.changeChosenCurrency(it)
+                scope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = if (state.error != null) {
+                            state.error.message ?: unknownErrorText
+                        } else {
+                            "Вы выбрали ${it.name} в качестве базовой валюты"
+                        }
+                    )
+                }
+            },
+            onSortDescRateClick = { viewModel?.changeOrder(Ordering.RATE_DESC) },
+            onSortAscRateClick = { viewModel?.changeOrder(Ordering.RATE_ASC) },
+            onSortAscQuoteClick = { viewModel?.changeOrder(Ordering.QUOTE_ASC) },
+            onSortDescQuoteClick = { viewModel?.changeOrder(Ordering.QUOTE_DESC) })
+    }, bottomBar = {
+        BottomBar(viewModel = viewModel, state = state)
+    }) {
+        CircularProgressBar(isDisplayed = state.isLoading)
 
         Card(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 83.dp)
-                .fillMaxSize(),
-            elevation = 4.dp
+                .fillMaxSize(), elevation = 4.dp
         ) {
-            when (mainScreenState.activeScreen) {
-                Screen.POPULAR -> PopularRatesScreen(
+            when (state.activeScreen) {
+                Screen.Popular -> PopularRatesScreen(
+                    currencyRates = state.currencyRates,
                     viewModel = viewModel,
-                    currencyRates = mainScreenState.currencyRates
                 ) { isFavorite, quote ->
                     scope.launch {
                         scaffoldState.snackbarHostState.showSnackbar(
@@ -74,9 +75,8 @@ fun ExchangeView(viewModel: ExchangeViewModel) {
                         )
                     }
                 }
-                Screen.FAVORITE -> FavoriteRatesScreen(
-                    favoriteCurrencyRates = mainScreenState.favoritesRates,
-                    mainScreenState = mainScreenState
+                Screen.Favorite -> FavoriteRatesScreen(
+                    state = state
                 )
             }
         }
@@ -95,9 +95,36 @@ fun CircularProgressBar(isDisplayed: Boolean) {
             CircularProgressIndicator(
                 modifier = Modifier
                     .padding()
-                    .size(50.dp),
-                color = MaterialTheme.colors.primary
+                    .size(50.dp), color = MaterialTheme.colors.primary
             )
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun DefaultPreview() = ExchangeRatesTestAppPublicTheme {
+    ExchangeView(
+        state = MainScreenState(), viewModel = null
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun LoadingPreview() = ExchangeRatesTestAppPublicTheme {
+    ExchangeView(
+        state = MainScreenState(
+            isLoading = true,
+        ), viewModel = null
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun ErrorPreview() = ExchangeRatesTestAppPublicTheme {
+    ExchangeView(
+        state = MainScreenState(
+            error = Throwable("Error"),
+        ), viewModel = null
+    )
 }

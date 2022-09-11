@@ -2,7 +2,12 @@ package com.example.exchangeratestestapppublic.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -11,11 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.R
 
 @Composable
-fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
+fun BottomBar(viewModel: ExchangeViewModel?, state: MainScreenState) {
     Surface(elevation = 8.dp, modifier = Modifier.height(75.dp)) {
         Row(
             modifier = Modifier
@@ -25,13 +31,13 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
             Box(
                 modifier = Modifier
                     .background(
-                        color = if (state.activeScreen == Screen.POPULAR) {
+                        color = if (state.activeScreen == Screen.Popular) {
                             MaterialTheme.colors.secondary
                         } else MaterialTheme.colors.background
                     )
                     .fillMaxHeight()
                     .clickable {
-                        viewModel.changeScreen(Screen.POPULAR)
+                        viewModel?.changeScreen(Screen.Popular)
                     }
                     .weight(0.5f),
                 contentAlignment = Alignment.Center
@@ -50,13 +56,13 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
             Box(
                 modifier = Modifier
                     .background(
-                        color = if (state.activeScreen == Screen.FAVORITE) {
+                        color = if (state.activeScreen == Screen.Favorite) {
                             MaterialTheme.colors.secondary
                         } else MaterialTheme.colors.background
                     )
                     .fillMaxHeight()
                     .clickable {
-                        viewModel.changeScreen(Screen.FAVORITE)
+                        viewModel?.changeScreen(Screen.Favorite)
                     }
                     .weight(0.5f),
                 contentAlignment = Alignment.Center
@@ -68,4 +74,10 @@ fun BottomBar(viewModel: ExchangeViewModel, state: MainScreenState) {
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun BottomBarPreview() {
+    BottomBar(null, MainScreenState())
 }

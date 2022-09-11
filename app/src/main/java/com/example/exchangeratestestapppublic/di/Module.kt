@@ -2,11 +2,13 @@ package com.example.exchangeratestestapppublic.di
 
 import android.app.Application
 import androidx.room.Room
-import com.example.exchangeratestestapppublic.ExchangeRepository
 import com.example.exchangeratestestapppublic.api.ExchangeApi
-import com.example.exchangeratestestapppublic.db.CurrenciesListDao
+import com.example.exchangeratestestapppublic.api.serializer.SymbolDeserializer
 import com.example.exchangeratestestapppublic.db.CurrencyDatabase
-import com.example.exchangeratestestapppublic.db.CurrencyRatesDao
+import com.example.exchangeratestestapppublic.db.dao.CurrenciesListDao
+import com.example.exchangeratestestapppublic.db.dao.CurrencyRatesDao
+import com.example.exchangeratestestapppublic.domain.model.Symbol
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,6 +23,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class DatabaseModule {
+
     @Provides
     @Singleton
     fun provideDatabase(context: Application): CurrencyDatabase {
@@ -46,14 +49,26 @@ class DatabaseModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-class NetworkModule() {
+class NetworkModule {
+
     @Provides
     @Singleton
-    fun provideRetrofit(httpClient: OkHttpClient): ExchangeApi {
+    fun provideGsonFactory(): GsonConverterFactory {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(Symbol::class.java, SymbolDeserializer())
+            .create()
+
+        return GsonConverterFactory
+            .create(gson)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(httpClient: OkHttpClient, gsonConverterFactory: GsonConverterFactory): ExchangeApi {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.apilayer.com/")
             .client(httpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(gsonConverterFactory)
             .build()
         return retrofit.create()
     }
@@ -61,29 +76,10 @@ class NetworkModule() {
     @Provides
     @Singleton
     fun provideClient(): OkHttpClient {
-        return OkHttpClient
-            .Builder()
+        return OkHttpClient.Builder()
             .addNetworkInterceptor(HttpLoggingInterceptor().apply {
-                setLevel(
-                    HttpLoggingInterceptor.Level.BODY
-                )
+                setLevel(HttpLoggingInterceptor.Level.BODY)
             })
             .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideRepository(
-        api: ExchangeApi,
-        currencyRatesDao: CurrencyRatesDao,
-        currenciesListDao: CurrenciesListDao,
-        currencyDatabase: CurrencyDatabase
-    ): ExchangeRepository {
-        return ExchangeRepository(
-            retrofit = api,
-            currenciesDao = currencyRatesDao,
-            currenciesListDao = currenciesListDao,
-            db = currencyDatabase
-        )
     }
 }
