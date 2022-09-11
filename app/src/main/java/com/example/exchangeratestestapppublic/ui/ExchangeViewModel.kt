@@ -48,9 +48,11 @@ data class MainScreenState(
     private var ratesJob: Job? = null
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        _mainScreenState.value = _mainScreenState.value.copy(error = throwable)
+        _mainScreenState.value = _mainScreenState.value.copy(
+            isLoading = false,
+            error = throwable,
+        )
         Log.e("ExchangeViewModel", "Error: $throwable", throwable)
-        _mainScreenState.value = _mainScreenState.value.copy(isLoading = false)
     }
     private val scope = viewModelScope + coroutineExceptionHandler
 
@@ -85,12 +87,11 @@ data class MainScreenState(
     }
 
     fun changeChosenCurrency(currency: NameModel) {
-        _mainScreenState.value = _mainScreenState.value.copy(isLoading = true)
         _mainScreenState.value = _mainScreenState.value.copy(
-            chosenCurrency = currency.symbol, chosenCurrencyName = currency.name
+            chosenCurrency = currency.symbol,
+            chosenCurrencyName = currency.name
         )
         getRates()
-        _mainScreenState.value = _mainScreenState.value.copy(isLoading = false)
         getFavoriteRates()
     }
 
