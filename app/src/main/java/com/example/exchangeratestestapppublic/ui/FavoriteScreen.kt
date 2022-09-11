@@ -45,11 +45,11 @@ fun FavoriteRatesScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = currencyRatesModel.base.toString(), style = MaterialTheme.typography.h5)
+                    Text(text = currencyRatesModel.base.value, style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(text = "/", style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(text = currencyRatesModel.quote.toString(), style = MaterialTheme.typography.h5)
+                    Text(text = currencyRatesModel.quote.value, style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = currencyRatesModel.rate.toString(),

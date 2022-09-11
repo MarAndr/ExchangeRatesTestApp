@@ -29,43 +29,36 @@ fun ExchangeView(state: MainScreenState, viewModel: ExchangeViewModel?) {
     val scope = rememberCoroutineScope()
     val unknownErrorText = stringResource(id = R.string.unknown_error)
 
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = {
-            TopBar(
-                modifier = Modifier,
-                state = state,
-                items = state.currenciesList,
-                onClick = {
-                    viewModel?.changeChosenCurrency(it)
-                    scope.launch {
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            message = if (state.error != null) {
-                                state.error.message
-                                    ?: unknownErrorText
-                            } else {
-                                "Вы выбрали ${it.name} в качестве базовой валюты"
-                            }
-                        )
-                    }
-                },
-                onSortDescRateClick = { viewModel?.changeOrder(Ordering.RATE_DESC) },
-                onSortAscRateClick = { viewModel?.changeOrder(Ordering.RATE_ASC) },
-                onSortAscQuoteClick = { viewModel?.changeOrder(Ordering.QUOTE_ASC) },
-                onSortDescQuoteClick = { viewModel?.changeOrder(Ordering.QUOTE_DESC) })
-        },
-        bottomBar = {
-            BottomBar(viewModel = viewModel, state = state)
-        }
-    ) {
+    Scaffold(scaffoldState = scaffoldState, topBar = {
+        TopBar(modifier = Modifier,
+            state = state,
+            items = state.currenciesList,
+            onClick = {
+                viewModel?.changeChosenCurrency(it)
+                scope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = if (state.error != null) {
+                            state.error.message ?: unknownErrorText
+                        } else {
+                            "Вы выбрали ${it.name} в качестве базовой валюты"
+                        }
+                    )
+                }
+            },
+            onSortDescRateClick = { viewModel?.changeOrder(Ordering.RATE_DESC) },
+            onSortAscRateClick = { viewModel?.changeOrder(Ordering.RATE_ASC) },
+            onSortAscQuoteClick = { viewModel?.changeOrder(Ordering.QUOTE_ASC) },
+            onSortDescQuoteClick = { viewModel?.changeOrder(Ordering.QUOTE_DESC) })
+    }, bottomBar = {
+        BottomBar(viewModel = viewModel, state = state)
+    }) {
         CircularProgressBar(isDisplayed = state.isLoading)
 
         Card(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 83.dp)
-                .fillMaxSize(),
-            elevation = 4.dp
+                .fillMaxSize(), elevation = 4.dp
         ) {
             when (state.activeScreen) {
                 Screen.Popular -> PopularRatesScreen(
@@ -83,8 +76,7 @@ fun ExchangeView(state: MainScreenState, viewModel: ExchangeViewModel?) {
                     }
                 }
                 Screen.Favorite -> FavoriteRatesScreen(
-                    favoriteCurrencyRates = state.favoritesRates,
-                    state = state
+                    favoriteCurrencyRates = state.favoritesRates, state = state
                 )
             }
         }
@@ -103,8 +95,7 @@ fun CircularProgressBar(isDisplayed: Boolean) {
             CircularProgressIndicator(
                 modifier = Modifier
                     .padding()
-                    .size(50.dp),
-                color = MaterialTheme.colors.primary
+                    .size(50.dp), color = MaterialTheme.colors.primary
             )
         }
     }
@@ -112,9 +103,28 @@ fun CircularProgressBar(isDisplayed: Boolean) {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun DefaultPreview() = ExchangeRatesTestAppPublicTheme {
+private fun DefaultPreview() = ExchangeRatesTestAppPublicTheme {
     ExchangeView(
-        state = MainScreenState(),
-        viewModel = null
+        state = MainScreenState(), viewModel = null
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun LoadingPreview() = ExchangeRatesTestAppPublicTheme {
+    ExchangeView(
+        state = MainScreenState(
+            isLoading = true,
+        ), viewModel = null
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun ErrorPreview() = ExchangeRatesTestAppPublicTheme {
+    ExchangeView(
+        state = MainScreenState(
+            error = Throwable("Error"),
+        ), viewModel = null
     )
 }

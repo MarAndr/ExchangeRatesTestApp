@@ -19,9 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.R
 import com.example.exchangeratestestapppublic.domain.model.RatesModel
+import com.example.exchangeratestestapppublic.domain.model.Symbol
 
 @Composable
 fun PopularRatesScreen(
@@ -36,6 +38,7 @@ fun PopularRatesScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // todo: Использовать LazyColumn вместо forEach
         if (currencyRates.isEmpty()) {
             Text(
                 text = stringResource(id = R.string.popular_screen_title),
@@ -52,12 +55,15 @@ fun PopularRatesScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = currencyRatesModel.base.toString(), style = MaterialTheme.typography.h5)
+                    Text(text = currencyRatesModel.base.value, style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(text = "/", style = MaterialTheme.typography.h5)
+
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(text = currencyRatesModel.quote.toString(), style = MaterialTheme.typography.h5)
+
+                    Text(text = currencyRatesModel.quote.value, style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.weight(1f))
+
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = currencyRatesModel.rate.toString(),
@@ -68,9 +74,9 @@ fun PopularRatesScreen(
                             modifier = Modifier.clickable {
                                 viewModel?.changeQuoteFavorite(
                                     isFavorite = !isFavorite,
-                                    quote = currencyRatesModel.quote.toString()
+                                    quote = currencyRatesModel.quote.value
                                 )
-                                onStarClick(isFavorite, currencyRatesModel.quote.toString())
+                                onStarClick(isFavorite, currencyRatesModel.quote.value)
                             },
                             painter = icon,
                             contentDescription = ""
@@ -83,5 +89,29 @@ fun PopularRatesScreen(
             }
         }
     }
+}
 
+@Preview(showBackground = true)
+@Composable
+private fun PreviewPopularRatesScreen() {
+    PopularRatesScreen(
+        currencyRates = listOf(
+            RatesModel(
+                base = Symbol.EUR,
+                quote = Symbol.USD,
+                rate = 1.2,
+                isQuoteFavorite = false,
+                timestamp = 0L,
+            ),
+            RatesModel(
+                base = Symbol.EUR,
+                quote = Symbol.GBP,
+                rate = 0.9,
+                isQuoteFavorite = true,
+                timestamp = 0L,
+            )
+        ),
+        viewModel = null,
+        onStarClick = { _, _ -> }
+    )
 }

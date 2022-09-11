@@ -1,27 +1,27 @@
 package com.example.exchangeratestestapppublic.domain.model
 
-sealed interface Symbol {
+sealed class Symbol(open val value: String) {
 
-    object USD : Symbol
-    object EUR : Symbol
-    object GBP : Symbol
-    object CNY : Symbol
-    object CHF : Symbol
-    object JPY : Symbol
-    object UAH : Symbol
-    object RUB : Symbol
-    object SEK : Symbol
-    object TRY : Symbol
-    object SGD : Symbol
-    object CAD : Symbol
-    object DKK : Symbol
-    object KRW : Symbol
-    object BRL : Symbol
-    object INR : Symbol
-    object PLN : Symbol
-    object AMD : Symbol
+    object USD : Symbol("USD")
+    object EUR : Symbol("EUR")
+    object GBP : Symbol("GBP")
+    object CNY : Symbol("CNY")
+    object CHF : Symbol("CHF")
+    object JPY : Symbol("JPY")
+    object UAH : Symbol("UAH")
+    object RUB : Symbol("RUB")
+    object SEK : Symbol("SEK")
+    object TRY : Symbol("TRY")
+    object SGD : Symbol("SGD")
+    object CAD : Symbol("CAD")
+    object DKK : Symbol("DKK")
+    object KRW : Symbol("KRW")
+    object BRL : Symbol("BRL")
+    object INR : Symbol("INR")
+    object PLN : Symbol("PLN")
+    object AMD : Symbol("AMD")
 
-    data class Unknown(val actualSymbol: String) : Symbol
+    data class Unknown(override val value: String) : Symbol(value)
 
     companion object {
 
