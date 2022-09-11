@@ -16,13 +16,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.R
 import com.example.exchangeratestestapppublic.domain.model.RatesModel
+import com.example.exchangeratestestapppublic.domain.model.Symbol
 
 @Composable
 fun FavoriteRatesScreen(
-    favoriteCurrencyRates: List<RatesModel>,
     state: MainScreenState
 ) {
     Column(
@@ -32,14 +33,14 @@ fun FavoriteRatesScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (favoriteCurrencyRates.isEmpty() || state.chosenCurrency == null) {
+        if (state.favoritesRates.isEmpty() || state.chosenCurrency == null) {
             Text(
                 text = stringResource(id = R.string.favorite_screen_title),
                 style = MaterialTheme.typography.h5,
                 color = Color.Gray
             )
         } else {
-            favoriteCurrencyRates.forEach { currencyRatesModel ->
+            state.favoritesRates.forEach { currencyRatesModel ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
@@ -62,4 +63,30 @@ fun FavoriteRatesScreen(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FavoriteRatesScreenPreview() {
+    FavoriteRatesScreen(
+        state = MainScreenState(
+            chosenCurrency = Symbol.USD,
+            favoritesRates = listOf(
+                RatesModel(
+                    base = Symbol.USD,
+                    quote = Symbol.EUR,
+                    rate = 0.85,
+                    timestamp = 0,
+                    isQuoteFavorite = true,
+                ),
+                RatesModel(
+                    base = Symbol.USD,
+                    quote = Symbol.GBP,
+                    rate = 0.75,
+                    timestamp = 0,
+                    isQuoteFavorite = true,
+                )
+            )
+        ),
+    )
 }

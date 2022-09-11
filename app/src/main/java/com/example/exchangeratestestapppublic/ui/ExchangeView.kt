@@ -76,7 +76,7 @@ fun ExchangeView(state: MainScreenState, viewModel: ExchangeViewModel?) {
                     }
                 }
                 Screen.Favorite -> FavoriteRatesScreen(
-                    favoriteCurrencyRates = state.favoritesRates, state = state
+                    state = state
                 )
             }
         }
