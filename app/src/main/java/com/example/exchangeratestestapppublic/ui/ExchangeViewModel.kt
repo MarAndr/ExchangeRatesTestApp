@@ -59,7 +59,12 @@ data class MainScreenState(
     init {
         scope.launch {
             getCurrencyNames()
-            getRates()
+
+            // Вот теперь видно, что поскольку вначале chosenCurrency = null,
+            // эта функция вообще ничего не будет выполнять,
+            // и её можно удалить
+            getRates(null, Ordering.QUOTE_ASC)
+
             repository.fetchCurrencyNamesList()
         }
     }
@@ -72,17 +77,31 @@ data class MainScreenState(
 
     fun changeOrder(ordering: Ordering) {
         _mainScreenState.value = _mainScreenState.value.copy(ordering = ordering)
+
         when (_mainScreenState.value.activeScreen) {
-            Screen.Popular -> getRates()
-            Screen.Favorite -> getFavoriteRates()
+            Screen.Popular -> getRates(
+                chosenCurrency = _mainScreenState.value.chosenCurrency,
+                ordering = ordering
+            )
+            Screen.Favorite -> getFavoriteRates(
+                chosenCurrency = _mainScreenState.value.chosenCurrency,
+                ordering = ordering
+            )
         }
     }
 
     fun changeScreen(screen: Screen) {
         _mainScreenState.value = _mainScreenState.value.copy(activeScreen = screen)
+
         when (screen) {
-            Screen.Popular -> getRates()
-            Screen.Favorite -> getFavoriteRates()
+            Screen.Popular -> getRates(
+                chosenCurrency = _mainScreenState.value.chosenCurrency,
+                ordering = _mainScreenState.value.ordering
+            )
+            Screen.Favorite -> getFavoriteRates(
+                chosenCurrency = _mainScreenState.value.chosenCurrency,
+                ordering = _mainScreenState.value.ordering
+            )
         }
     }
 
@@ -91,8 +110,14 @@ data class MainScreenState(
             chosenCurrency = currency.symbol,
             chosenCurrencyName = currency.name
         )
-        getRates()
-        getFavoriteRates()
+        getRates(
+            chosenCurrency = currency.symbol,
+            ordering = _mainScreenState.value.ordering
+        )
+        getFavoriteRates(
+            chosenCurrency = currency.symbol,
+            ordering = _mainScreenState.value.ordering
+        )
     }
 
     private fun getCurrencyNames() = scope.launch {
@@ -103,21 +128,17 @@ data class MainScreenState(
         }
     }
 
-    private fun getRates() = scope.launch {
-        val chosenCurrency = _mainScreenState.value.chosenCurrency ?: return@launch
+    private fun getRates(chosenCurrency: Symbol?, ordering: Ordering) = scope.launch {
+        chosenCurrency ?: return@launch
 
         ratesJob?.cancelAndJoin()
 
-        ratesJob = repository.getCurrencyRatesSorted(
-            base = chosenCurrency,
-            ordering = _mainScreenState.value.ordering
-        )
+        ratesJob = repository.getCurrencyRatesSorted(base = chosenCurrency, ordering = ordering)
             .distinctUntilChanged()
             .onEach { rates ->
                 _mainScreenState.value = _mainScreenState.value.copy(currencyRates = rates)
                 fetchRatesIfNeeded(chosenCurrency, rates)
-            }
-            .launchIn(scope)
+            }.launchIn(scope)
     }
 
     private suspend fun fetchRatesIfNeeded(base: Symbol, rates: List<RatesModel>) {
@@ -129,10 +150,10 @@ data class MainScreenState(
         }
     }
 
-    private fun getFavoriteRates() = scope.launch {
-        val chosenCurrency = _mainScreenState.value.chosenCurrency ?: return@launch
+    private fun getFavoriteRates(chosenCurrency: Symbol?, ordering: Ordering) = scope.launch {
+        chosenCurrency ?: return@launch
 
-        repository.getFavoriteCurrencyRates(base = chosenCurrency, ordering = _mainScreenState.value.ordering)
+        repository.getFavoriteCurrencyRates(base = chosenCurrency, ordering = ordering)
             .distinctUntilChanged()
             .collect { rates ->
                 _mainScreenState.value = _mainScreenState.value.copy(favoritesRates = rates)
