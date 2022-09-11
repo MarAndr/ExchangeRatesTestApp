@@ -10,6 +10,7 @@ import com.example.exchangeratestestapppublic.domain.model.Symbol
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -104,7 +105,7 @@ data class MainScreenState(
     private fun getRates() = scope.launch {
         val chosenCurrency = _mainScreenState.value.chosenCurrency ?: return@launch
 
-        ratesJob?.cancel()
+        ratesJob?.cancelAndJoin()
 
         ratesJob = repository.getCurrencyRatesSorted(
             base = chosenCurrency,
