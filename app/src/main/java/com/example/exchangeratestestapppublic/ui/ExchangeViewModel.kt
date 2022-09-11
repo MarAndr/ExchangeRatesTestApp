@@ -50,20 +50,14 @@ data class MainScreenState(
     private var ratesJob: Job? = null
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        mainScreenStateValue = mainScreenStateValue.copy(error = throwable)
+        _mainScreenState.value = _mainScreenState.value.copy(error = throwable)
         Log.e("ExchangeViewModel", "Error: $throwable", throwable)
-        mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
+        _mainScreenState.value = _mainScreenState.value.copy(isLoading = false)
     }
     private val scope = viewModelScope + coroutineExceptionHandler + Dispatchers.IO
 
-    private var mainScreenStateValue: MainScreenState
-        get() = _mainScreenState.value
-        set(value) {
-            _mainScreenState.value = value
-        }
-
     init {
-        scope.launch() {
+        scope.launch {
             getCurrencyNames()
             getRates()
             repository.fetchCurrencyNamesList()
@@ -71,15 +65,15 @@ data class MainScreenState(
     }
 
     fun changeQuoteFavorite(isFavorite: Boolean, quote: String) {
-        scope.launch() {
+        scope.launch {
             repository.changeFavoriteField(isFavorite, quote)
         }
     }
 
     fun changeOrder(ordering: Ordering) {
-        scope.launch() {
-            mainScreenStateValue = mainScreenStateValue.copy(ordering = ordering)
-            when (mainScreenStateValue.activeScreen) {
+        scope.launch {
+            _mainScreenState.value = _mainScreenState.value.copy(ordering = ordering)
+            when (_mainScreenState.value.activeScreen) {
                 Screen.Popular -> getRates()
                 Screen.Favorite -> getFavoriteRates()
             }
@@ -87,8 +81,8 @@ data class MainScreenState(
     }
 
     fun changeScreen(screen: Screen) {
-        scope.launch() {
-            mainScreenStateValue = mainScreenStateValue.copy(activeScreen = screen)
+        scope.launch {
+            _mainScreenState.value = _mainScreenState.value.copy(activeScreen = screen)
             when (screen) {
                 Screen.Popular -> getRates()
                 Screen.Favorite -> getFavoriteRates()
@@ -97,33 +91,33 @@ data class MainScreenState(
     }
 
     fun changeChosenCurrency(currency: NameModel) {
-        scope.launch() {
-            mainScreenStateValue = mainScreenStateValue.copy(isLoading = true)
-            mainScreenStateValue = mainScreenStateValue.copy(
+        scope.launch {
+            _mainScreenState.value = _mainScreenState.value.copy(isLoading = true)
+            _mainScreenState.value = _mainScreenState.value.copy(
                 chosenCurrency = currency.symbol, chosenCurrencyName = currency.name
             )
             getRates()
-            mainScreenStateValue = mainScreenStateValue.copy(isLoading = false)
+            _mainScreenState.value = _mainScreenState.value.copy(isLoading = false)
             getFavoriteRates()
         }
     }
 
     private fun getCurrencyNames() {
-        scope.launch() {
+        scope.launch {
             repository.getCurrenciesList().onEach { names ->
-                mainScreenStateValue = mainScreenStateValue.copy(currenciesList = names)
+                _mainScreenState.value = _mainScreenState.value.copy(currenciesList = names)
             }.collect()
         }
     }
 
     private fun getRates() {
-        mainScreenStateValue.chosenCurrency?.let { base ->
+        _mainScreenState.value.chosenCurrency?.let { base ->
             viewModelScope.launch {
                 ratesJob?.cancelAndJoin()
                 ratesJob = repository.getCurrencyRatesSorted(
-                    base = base, ordering = mainScreenStateValue.ordering
+                    base = base, ordering = _mainScreenState.value.ordering
                 ).distinctUntilChanged().onEach { rates ->
-                    mainScreenStateValue = mainScreenStateValue.copy(currencyRates = rates)
+                    _mainScreenState.value = _mainScreenState.value.copy(currencyRates = rates)
                     fetchRatesIfNeeded(base, rates)
                 }.launchIn(scope)
             }
@@ -140,11 +134,11 @@ data class MainScreenState(
     }
 
     private fun getFavoriteRates() {
-        mainScreenStateValue.chosenCurrency?.let { base ->
+        _mainScreenState.value.chosenCurrency?.let { base ->
             repository.getFavoriteCurrencyRates(
-                base = base, ordering = mainScreenStateValue.ordering
+                base = base, ordering = _mainScreenState.value.ordering
             ).distinctUntilChanged().onEach { rates ->
-                mainScreenStateValue = mainScreenStateValue.copy(favoritesRates = rates)
+                _mainScreenState.value = _mainScreenState.value.copy(favoritesRates = rates)
             }.launchIn(scope)
         }
     }
