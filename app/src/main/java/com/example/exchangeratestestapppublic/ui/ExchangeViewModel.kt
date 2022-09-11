@@ -9,7 +9,6 @@ import com.example.exchangeratestestapppublic.domain.model.RatesModel
 import com.example.exchangeratestestapppublic.domain.model.Symbol
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +53,7 @@ data class MainScreenState(
         Log.e("ExchangeViewModel", "Error: $throwable", throwable)
         _mainScreenState.value = _mainScreenState.value.copy(isLoading = false)
     }
-    private val scope = viewModelScope + coroutineExceptionHandler + Dispatchers.IO
+    private val scope = viewModelScope + coroutineExceptionHandler
 
     init {
         scope.launch {
@@ -71,35 +70,29 @@ data class MainScreenState(
     }
 
     fun changeOrder(ordering: Ordering) {
-        scope.launch {
-            _mainScreenState.value = _mainScreenState.value.copy(ordering = ordering)
-            when (_mainScreenState.value.activeScreen) {
-                Screen.Popular -> getRates()
-                Screen.Favorite -> getFavoriteRates()
-            }
+        _mainScreenState.value = _mainScreenState.value.copy(ordering = ordering)
+        when (_mainScreenState.value.activeScreen) {
+            Screen.Popular -> getRates()
+            Screen.Favorite -> getFavoriteRates()
         }
     }
 
     fun changeScreen(screen: Screen) {
-        scope.launch {
-            _mainScreenState.value = _mainScreenState.value.copy(activeScreen = screen)
-            when (screen) {
-                Screen.Popular -> getRates()
-                Screen.Favorite -> getFavoriteRates()
-            }
+        _mainScreenState.value = _mainScreenState.value.copy(activeScreen = screen)
+        when (screen) {
+            Screen.Popular -> getRates()
+            Screen.Favorite -> getFavoriteRates()
         }
     }
 
     fun changeChosenCurrency(currency: NameModel) {
-        scope.launch {
-            _mainScreenState.value = _mainScreenState.value.copy(isLoading = true)
-            _mainScreenState.value = _mainScreenState.value.copy(
-                chosenCurrency = currency.symbol, chosenCurrencyName = currency.name
-            )
-            getRates()
-            _mainScreenState.value = _mainScreenState.value.copy(isLoading = false)
-            getFavoriteRates()
-        }
+        _mainScreenState.value = _mainScreenState.value.copy(isLoading = true)
+        _mainScreenState.value = _mainScreenState.value.copy(
+            chosenCurrency = currency.symbol, chosenCurrencyName = currency.name
+        )
+        getRates()
+        _mainScreenState.value = _mainScreenState.value.copy(isLoading = false)
+        getFavoriteRates()
     }
 
     private fun getCurrencyNames() {
