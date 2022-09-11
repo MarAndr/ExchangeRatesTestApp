@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
     fun getCurrencies(): Flow<List<NamesDbModel>>
 
     @Query("select * from NamesDbModel")
-    fun getCurrenciesList(): List<NamesDbModel>
+    suspend fun getCurrenciesList(): List<NamesDbModel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addCurrenciesList(currencies: NamesDbModel)

@@ -54,7 +54,7 @@ import javax.inject.Singleton
         }.map { list -> list.map(ratesDbMapper::dbToDomainModel) }
     }
 
-    fun getCurrenciesList(): Flow<List<NameModel>> {
+    fun getCurrenciesFlow(): Flow<List<NameModel>> {
         return currenciesListDao.getCurrencies().map { currencies ->
             currencies.map(namesDbMapper::mapToDomain)
         }
