@@ -1,6 +1,7 @@
 package com.example.exchangeratestestapppublic
 
 import com.example.exchangeratestestapppublic.api.ExchangeApi
+import com.example.exchangeratestestapppublic.api.model.Symbol
 import com.example.exchangeratestestapppublic.db.*
 import com.example.exchangeratestestapppublic.ui.Ordering
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,7 @@ class ExchangeRepository @Inject constructor(
     suspend fun fetchLatestCurrency(base: String) {
         val response = retrofit.getLatestCurrency(
             base = base,
-            symbols = Symbols.getSymbolsString()
+            symbols = Symbol.values().joinToString(",")
         )
         if (response.success != false) {
             response.rates?.let {
@@ -79,30 +80,5 @@ class ExchangeRepository @Inject constructor(
 
     suspend fun changeFavoriteField(favorite: Boolean, quote: String) {
         currenciesDao.changeFavoriteField(isQuoteFavorite = favorite, quote = quote)
-    }
-}
-
-enum class Symbols {
-    USD,
-    EUR,
-    GBP,
-    CNY,
-    CHF,
-    JPY,
-    UAH,
-    RUB,
-    SEK,
-    TRY,
-    SGD,
-    CAD,
-    DKK,
-    KRW,
-    BRL,
-    INR,
-    PLN,
-    AMD;
-
-    companion object {
-        fun getSymbolsString() = values().joinToString(",")
     }
 }
