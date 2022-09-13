@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 data class MainScreenState(
-    val activeScreen: Screen = Screen.POPULAR,
+    val activeScreen: Screen = Screen.Popular,
     val chosenCurrency: String? = null,
     val chosenCurrencyName: String? = null,
     val currencyRates: List<CurrencyRatesModel> = emptyList(),
@@ -67,8 +67,8 @@ class ExchangeViewModel @Inject constructor(
         scope.launch() {
             mainScreenStateValue = mainScreenStateValue.copy(ordering = ordering)
             when (mainScreenStateValue.activeScreen) {
-                Screen.POPULAR -> getRates()
-                Screen.FAVORITE -> getFavoriteRates()
+                Screen.Popular -> getRates()
+                Screen.Favorite -> getFavoriteRates()
             }
         }
     }
@@ -77,8 +77,8 @@ class ExchangeViewModel @Inject constructor(
         scope.launch() {
             mainScreenStateValue = mainScreenStateValue.copy(activeScreen = screen)
             when (screen) {
-                Screen.POPULAR -> getRates()
-                Screen.FAVORITE -> getFavoriteRates()
+                Screen.Popular -> getRates()
+                Screen.Favorite -> getFavoriteRates()
             }
         }
     }
