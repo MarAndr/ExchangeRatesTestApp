@@ -2,7 +2,6 @@ package com.example.exchangeratestestapppublic.di
 
 import android.app.Application
 import androidx.room.Room
-import com.example.exchangeratestestapppublic.ExchangeRepository
 import com.example.exchangeratestestapppublic.api.ExchangeApi
 import com.example.exchangeratestestapppublic.db.CurrenciesListDao
 import com.example.exchangeratestestapppublic.db.CurrencyDatabase
@@ -69,21 +68,5 @@ class NetworkModule() {
                 )
             })
             .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideRepository(
-        api: ExchangeApi,
-        currencyRatesDao: CurrencyRatesDao,
-        currenciesListDao: CurrenciesListDao,
-        currencyDatabase: CurrencyDatabase
-    ): ExchangeRepository {
-        return ExchangeRepository(
-            retrofit = api,
-            currenciesDao = currencyRatesDao,
-            currenciesListDao = currenciesListDao,
-            db = currencyDatabase
-        )
     }
 }
