@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 interface CurrencyRatesDao {
 
     @Query("select * from RatesDbModel where base = :base")
-    fun getCurrencyRates(base: String?): Flow<List<RatesDbModel>>
+    fun getCurrencyRates(base: String?): List<RatesDbModel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addCurrencyRates(currencyRatesModel: RatesDbModel)
+    fun addCurrencyRates(currencyRatesModel: List<RatesDbModel>)
 
     @Query(
         "update RatesDbModel set isQuoteFavorite = :isQuoteFavorite " +

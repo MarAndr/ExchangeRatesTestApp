@@ -1,6 +1,6 @@
 package com.example.exchangeratestestapppublic.domain.model
 
-sealed class Symbol(open val value: String) {
+sealed class Symbol(val value: String) {
 
     object USD : Symbol("USD")
     object EUR : Symbol("EUR")
@@ -21,7 +21,7 @@ sealed class Symbol(open val value: String) {
     object PLN : Symbol("PLN")
     object AMD : Symbol("AMD")
 
-    data class Unknown(override val value: String) : Symbol(value)
+    class Unknown(value: String) : Symbol(value)
 
     companion object {
 

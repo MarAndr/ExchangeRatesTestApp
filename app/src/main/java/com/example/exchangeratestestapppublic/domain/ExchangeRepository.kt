@@ -22,35 +22,38 @@ import javax.inject.Singleton
     private val ratesDbMapper: RatesDbMapper,
 ) {
 
-    suspend fun fetchLatestCurrency(base: Symbol) {
+    suspend fun fetchLatestCurrency(base: Symbol): List<RatesModel> {
         val response = retrofit.getLatestCurrency(
-            base = base.toString(), symbols = Symbol.values().joinToString(",")
+            base = base.value,
+            symbols = Symbol.values().joinToString(",") { it.value }
         )
-        if (!response.success || response.rates == null) {
-            return
+        if (response.rates == null) {
+            throw Exception("No rates")
         }
 
-        response.rates.forEach { (quote, rate) ->
-            val ratesDbModel = ratesDbMapper.apiToDb(response, base, quote, rate)
-            currenciesDao.addCurrencyRates(currencyRatesModel = ratesDbModel)
+        val ratesDbModel = response.rates.map { (quote, rate) ->
+            ratesDbMapper.apiToDb(response, base, quote, rate)
         }
+        currenciesDao.addCurrencyRates(currencyRatesModel = ratesDbModel)
+
+        return currenciesDao.getCurrencyRates(base = base.value).map { ratesDbMapper.dbToDomainModel(it) }
     }
 
     fun getCurrencyRatesSorted(base: Symbol, ordering: Ordering): Flow<List<RatesModel>> {
         return when (ordering) {
-            Ordering.QUOTE_ASC -> currenciesDao.getCurrencyRatesOrderByQuote(base.toString(), true)
-            Ordering.QUOTE_DESC -> currenciesDao.getCurrencyRatesOrderByQuote(base.toString(), false)
-            Ordering.RATE_ASC -> currenciesDao.getCurrencyRatesOrderByRate(base.toString(), true)
-            Ordering.RATE_DESC -> currenciesDao.getCurrencyRatesOrderByRate(base.toString(), false)
+            Ordering.QUOTE_ASC -> currenciesDao.getCurrencyRatesOrderByQuote(base.value, true)
+            Ordering.QUOTE_DESC -> currenciesDao.getCurrencyRatesOrderByQuote(base.value, false)
+            Ordering.RATE_ASC -> currenciesDao.getCurrencyRatesOrderByRate(base.value, true)
+            Ordering.RATE_DESC -> currenciesDao.getCurrencyRatesOrderByRate(base.value, false)
         }.map { list -> list.map(ratesDbMapper::dbToDomainModel) }
     }
 
     fun getFavoriteCurrencyRates(base: Symbol, ordering: Ordering): Flow<List<RatesModel>> {
         return when (ordering) {
-            Ordering.QUOTE_ASC -> currenciesDao.getFavoriteCurrencyRatesByQuote(base.toString(), true)
-            Ordering.QUOTE_DESC -> currenciesDao.getFavoriteCurrencyRatesByQuote(base.toString(), false)
-            Ordering.RATE_ASC -> currenciesDao.getFavoriteCurrencyRatesByRates(base.toString(), true)
-            Ordering.RATE_DESC -> currenciesDao.getFavoriteCurrencyRatesByRates(base.toString(), false)
+            Ordering.QUOTE_ASC -> currenciesDao.getFavoriteCurrencyRatesByQuote(base.value, true)
+            Ordering.QUOTE_DESC -> currenciesDao.getFavoriteCurrencyRatesByQuote(base.value, false)
+            Ordering.RATE_ASC -> currenciesDao.getFavoriteCurrencyRatesByRates(base.value, true)
+            Ordering.RATE_DESC -> currenciesDao.getFavoriteCurrencyRatesByRates(base.value, false)
         }.map { list -> list.map(ratesDbMapper::dbToDomainModel) }
     }
 
@@ -60,20 +63,19 @@ import javax.inject.Singleton
         }
     }
 
-    suspend fun fetchCurrencyNamesList() {
-        if (currenciesListDao.getCurrenciesList().isNotEmpty()) {
-            return
-        }
-
+    suspend fun fetchCurrencyNamesList(): List<NameModel> {
         val response = retrofit.getCurrencyNamesList()
-        if (!response.success || response.symbols == null) {
-            return
+        if (response.symbols == null) {
+            throw Exception("Symbols are null")
         }
 
-        response.symbols.forEach { (symbol, name) ->
-            val currencyNamesList = namesDbMapper.mapToDb(symbol, name)
-            currenciesListDao.addCurrenciesList(currencyNamesList)
+        val dbModels = response.symbols.map { (symbol, name) ->
+            namesDbMapper.mapToDb(symbol, name)
         }
+
+        currenciesListDao.addCurrenciesList(dbModels)
+
+        return currenciesListDao.getCurrenciesList().map { namesDbMapper.mapToDomain(it) }
     }
 
     suspend fun changeFavoriteField(favorite: Boolean, quote: String) {

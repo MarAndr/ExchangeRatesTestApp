@@ -20,10 +20,10 @@ class RatesDbMapper @Inject constructor(
     ): RatesDbModel {
         return RatesDbModel(
             timestamp = response.timestamp ?: 0,
-            base = base.toString(),
-            quote = quote.toString(),
+            base = base.value,
+            quote = quote.value,
             rate = (rate * 1000.0).roundToInt() / 1000.0,
-            isQuoteFavorite = ratesDao.getFavoriteField(quote.toString()) ?: false
+            isQuoteFavorite = ratesDao.getFavoriteField(quote.value) ?: false
         )
     }
 

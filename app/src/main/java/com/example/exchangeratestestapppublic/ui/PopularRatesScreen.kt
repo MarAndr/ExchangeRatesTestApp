@@ -66,7 +66,7 @@ fun PopularRatesScreen(
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = currencyRatesModel.rate.toString(),
+                            text = currencyRatesModel.rate.value,
                             style = MaterialTheme.typography.h5
                         )
                         Spacer(modifier = Modifier.width(32.dp))

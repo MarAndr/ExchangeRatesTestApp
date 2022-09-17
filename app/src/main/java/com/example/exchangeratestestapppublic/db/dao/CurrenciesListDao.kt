@@ -16,5 +16,5 @@ import kotlinx.coroutines.flow.Flow
     suspend fun getCurrenciesList(): List<NamesDbModel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addCurrenciesList(currencies: NamesDbModel)
+    fun addCurrenciesList(currencies: List<NamesDbModel>)
 }

@@ -8,17 +8,10 @@ import com.example.exchangeratestestapppublic.domain.model.NameModel
 import com.example.exchangeratestestapppublic.domain.model.RatesModel
 import com.example.exchangeratestestapppublic.domain.model.Symbol
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 data class MainScreenState(
@@ -33,133 +26,59 @@ data class MainScreenState(
     val isLoading: Boolean = false
 )
 
-@HiltViewModel class ExchangeViewModel @Inject constructor(
+@HiltViewModel
+class ExchangeViewModel @Inject constructor(
     private val repository: ExchangeRepository
 ) : ViewModel() {
 
-    companion object {
-
-        val MIN_DELAY_REQUEST = TimeUnit.HOURS.toMillis(2)
-    }
-
-    private val _mainScreenState = MutableStateFlow(MainScreenState())
+    private val _mainScreenState = MutableStateFlow(MainScreenState(isLoading = true))
     val mainScreen: StateFlow<MainScreenState> = _mainScreenState
 
-    private var ratesJob: Job? = null
-
-    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        _mainScreenState.value = _mainScreenState.value.copy(
-            isLoading = false,
-            error = throwable,
-        )
-        Log.e("ExchangeViewModel", "Error: $throwable", throwable)
-    }
-    private val scope = viewModelScope + coroutineExceptionHandler
-
     init {
-        scope.launch {
-            getCurrencyNames()
+        fetchNamesList()
+    }
 
-            // Вот теперь видно, что поскольку вначале chosenCurrency = null,
-            // эта функция вообще ничего не будет выполнять,
-            // и её можно удалить
-            getRates(null, Ordering.QUOTE_ASC)
-
-            repository.fetchCurrencyNamesList()
+    private fun fetchNamesList() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val names = repository.fetchCurrencyNamesList()
+            _mainScreenState.value = _mainScreenState.value.copy(currenciesList = names)
+        } catch (e: Exception) {
+            Log.e(this::class.java.simpleName, "fetchNamesList: ", e)
+            _mainScreenState.value = _mainScreenState.value.copy(error = e)
+        } finally {
+            _mainScreenState.value = _mainScreenState.value.copy(isLoading = false)
         }
+    }
+
+    fun changeChosenCurrency(nameModel: NameModel) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val currency = repository.fetchLatestCurrency(nameModel.symbol)
+            _mainScreenState.value = _mainScreenState.value.copy(
+                chosenCurrency = nameModel.symbol,
+                chosenCurrencyName = nameModel.name,
+                currencyRates = currency
+            )
+        } catch (e: Exception) {
+            Log.e(this::class.java.simpleName, "changeChosenCurrency: ", e)
+            _mainScreenState.value = _mainScreenState.value.copy(error = e)
+        }
+    }
+
+    fun changeOrder(rateDesc: Ordering) {
+        // todo
+    }
+
+    fun changeScreen(favorite: Screen) {
+        // todo
     }
 
     fun changeQuoteFavorite(isFavorite: Boolean, quote: String) {
-        scope.launch {
-            repository.changeFavoriteField(isFavorite, quote)
-        }
-    }
-
-    fun changeOrder(ordering: Ordering) {
-        _mainScreenState.value = _mainScreenState.value.copy(ordering = ordering)
-
-        when (_mainScreenState.value.activeScreen) {
-            Screen.Popular -> getRates(
-                chosenCurrency = _mainScreenState.value.chosenCurrency,
-                ordering = ordering
-            )
-            Screen.Favorite -> getFavoriteRates(
-                chosenCurrency = _mainScreenState.value.chosenCurrency,
-                ordering = ordering
-            )
-        }
-    }
-
-    fun changeScreen(screen: Screen) {
-        _mainScreenState.value = _mainScreenState.value.copy(activeScreen = screen)
-
-        when (screen) {
-            Screen.Popular -> getRates(
-                chosenCurrency = _mainScreenState.value.chosenCurrency,
-                ordering = _mainScreenState.value.ordering
-            )
-            Screen.Favorite -> getFavoriteRates(
-                chosenCurrency = _mainScreenState.value.chosenCurrency,
-                ordering = _mainScreenState.value.ordering
-            )
-        }
-    }
-
-    fun changeChosenCurrency(currency: NameModel) {
-        _mainScreenState.value = _mainScreenState.value.copy(
-            chosenCurrency = currency.symbol,
-            chosenCurrencyName = currency.name
-        )
-        getRates(
-            chosenCurrency = currency.symbol,
-            ordering = _mainScreenState.value.ordering
-        )
-        getFavoriteRates(
-            chosenCurrency = currency.symbol,
-            ordering = _mainScreenState.value.ordering
-        )
-    }
-
-    private fun getCurrencyNames() = scope.launch {
-        repository.getCurrenciesFlow().collect { names ->
-            _mainScreenState.value = _mainScreenState.value.copy(
-                currenciesList = names
-            )
-        }
-    }
-
-    private fun getRates(chosenCurrency: Symbol?, ordering: Ordering) = scope.launch {
-        chosenCurrency ?: return@launch
-
-        ratesJob?.cancelAndJoin()
-
-        ratesJob = repository.getCurrencyRatesSorted(base = chosenCurrency, ordering = ordering)
-            .distinctUntilChanged()
-            .onEach { rates ->
-                _mainScreenState.value = _mainScreenState.value.copy(currencyRates = rates)
-                fetchRatesIfNeeded(chosenCurrency, rates)
-            }.launchIn(scope)
-    }
-
-    private suspend fun fetchRatesIfNeeded(base: Symbol, rates: List<RatesModel>) {
-        val timestamp = rates.minOfOrNull { it.timestamp } ?: 0L
-        val current = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
-        val timeDif = timestamp + MIN_DELAY_REQUEST - current
-        if (rates.isEmpty() || timeDif < 0) {
-            repository.fetchLatestCurrency(base)
-        }
-    }
-
-    private fun getFavoriteRates(chosenCurrency: Symbol?, ordering: Ordering) = scope.launch {
-        chosenCurrency ?: return@launch
-
-        repository.getFavoriteCurrencyRates(base = chosenCurrency, ordering = ordering)
-            .distinctUntilChanged()
-            .collect { rates ->
-                _mainScreenState.value = _mainScreenState.value.copy(favoritesRates = rates)
-            }
+        // todo
     }
 }
 
-enum class Ordering { QUOTE_ASC, QUOTE_DESC, RATE_DESC, RATE_ASC,
+enum class Ordering {
+    QUOTE_ASC,
+    QUOTE_DESC,
+    RATE_DESC, RATE_ASC,
 }

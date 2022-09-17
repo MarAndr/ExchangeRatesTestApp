@@ -53,7 +53,7 @@ fun FavoriteRatesScreen(
                     Text(text = currencyRatesModel.quote.value, style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = currencyRatesModel.rate.toString(),
+                        text = currencyRatesModel.rate.value,
                         style = MaterialTheme.typography.h5
                     )
                 }

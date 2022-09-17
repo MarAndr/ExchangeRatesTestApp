@@ -15,7 +15,7 @@ class NamesDbMapper @Inject constructor() {
 
     fun mapToDb(symbol: Symbol, name: String) = NamesDbModel(
         id = 0,
-        symbol = symbol.toString(),
+        symbol = symbol.value,
         name = name
     )
 }
