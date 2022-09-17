@@ -107,9 +107,9 @@ fun DropdownMenu(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                } else if (state.chosenCurrencyName != null) {
+                } else if (state.chosenCurrency != null) {
                     Text(
-                        text = "${state.chosenCurrencyName}(${state.chosenCurrency})",
+                        text = "${state.chosenCurrency.name} (${state.chosenCurrency})",
                         style = MaterialTheme.typography.h6,
                         maxLines = 1
                     )

@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.exchangeratestestapppublic.R
+import com.example.exchangeratestestapppublic.domain.model.NameModel
 import com.example.exchangeratestestapppublic.domain.model.RatesModel
 import com.example.exchangeratestestapppublic.domain.model.Symbol
 
@@ -53,7 +54,7 @@ fun FavoriteRatesScreen(
                     Text(text = currencyRatesModel.quote.value, style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = currencyRatesModel.rate.value,
+                        text = currencyRatesModel.rate.toString(),
                         style = MaterialTheme.typography.h5
                     )
                 }
@@ -70,21 +71,21 @@ fun FavoriteRatesScreen(
 fun FavoriteRatesScreenPreview() {
     FavoriteRatesScreen(
         state = MainScreenState(
-            chosenCurrency = Symbol.USD,
+            chosenCurrency = NameModel(
+                id = 0,
+                symbol = Symbol.USD,
+                name = "US Dollar"
+            ),
             favoritesRates = listOf(
                 RatesModel(
                     base = Symbol.USD,
                     quote = Symbol.EUR,
                     rate = 0.85,
-                    timestamp = 0,
-                    isQuoteFavorite = true,
                 ),
                 RatesModel(
                     base = Symbol.USD,
                     quote = Symbol.GBP,
                     rate = 0.75,
-                    timestamp = 0,
-                    isQuoteFavorite = true,
                 )
             )
         ),

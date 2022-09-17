@@ -6,7 +6,6 @@ import com.example.exchangeratestestapppublic.api.ExchangeApi
 import com.example.exchangeratestestapppublic.api.serializer.SymbolDeserializer
 import com.example.exchangeratestestapppublic.db.CurrencyDatabase
 import com.example.exchangeratestestapppublic.db.dao.CurrenciesListDao
-import com.example.exchangeratestestapppublic.db.dao.CurrencyRatesDao
 import com.example.exchangeratestestapppublic.domain.model.Symbol
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -32,12 +31,6 @@ class DatabaseModule {
             CurrencyDatabase::class.java,
             CurrencyDatabase.DB_NAME
         ).build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideCurrencyRatesDao(db: CurrencyDatabase): CurrencyRatesDao {
-        return db.currencyRatesDao()
     }
 
     @Provides

@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.exchangeratestestapppublic.domain.ExchangeRepository
 import com.example.exchangeratestestapppublic.domain.model.NameModel
 import com.example.exchangeratestestapppublic.domain.model.RatesModel
-import com.example.exchangeratestestapppublic.domain.model.Symbol
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,8 +16,7 @@ import javax.inject.Inject
 
 data class MainScreenState(
     val activeScreen: Screen = Screen.Popular,
-    val chosenCurrency: Symbol? = null,
-    val chosenCurrencyName: String? = null,
+    val chosenCurrency: NameModel? = null,
     val currencyRates: List<RatesModel> = emptyList(),
     val currenciesList: List<NameModel> = emptyList(),
     val ordering: Ordering = Ordering.QUOTE_ASC,
@@ -34,11 +33,13 @@ class ExchangeViewModel @Inject constructor(
     private val _mainScreenState = MutableStateFlow(MainScreenState(isLoading = true))
     val mainScreen: StateFlow<MainScreenState> = _mainScreenState
 
+    private var tickerJob: Job? = null
+
     init {
         fetchNamesList()
     }
 
-    private fun fetchNamesList() = viewModelScope.launch(Dispatchers.IO) {
+    private fun fetchNamesList() = viewModelScope.launch {
         try {
             val names = repository.fetchCurrencyNamesList()
             _mainScreenState.value = _mainScreenState.value.copy(currenciesList = names)
@@ -50,12 +51,30 @@ class ExchangeViewModel @Inject constructor(
         }
     }
 
-    fun changeChosenCurrency(nameModel: NameModel) = viewModelScope.launch(Dispatchers.IO) {
+    private fun startTicker(chosenCurrency: NameModel) {
+        tickerJob?.cancel()
+
+        tickerJob = viewModelScope.launch {
+            while (true) {
+                fetchRates(chosenCurrency)
+                delay(1000)
+            }
+        }
+    }
+
+    fun changeChosenCurrency(nameModel: NameModel) = viewModelScope.launch {
+        _mainScreenState.value = _mainScreenState.value.copy(
+            chosenCurrency = nameModel
+        )
+
+        startTicker(nameModel)
+    }
+
+    private fun fetchRates(nameModel: NameModel) = viewModelScope.launch {
         try {
             val currency = repository.fetchLatestCurrency(nameModel.symbol)
             _mainScreenState.value = _mainScreenState.value.copy(
-                chosenCurrency = nameModel.symbol,
-                chosenCurrencyName = nameModel.name,
+                chosenCurrency = nameModel,
                 currencyRates = currency
             )
         } catch (e: Exception) {
@@ -72,8 +91,8 @@ class ExchangeViewModel @Inject constructor(
         // todo
     }
 
-    fun changeQuoteFavorite(isFavorite: Boolean, quote: String) {
-        // todo
+    fun changeQuoteFavorite(isFavorite: Boolean, nameModel: NameModel) {
+        repository.setFavourite()
     }
 }
 

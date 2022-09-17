@@ -47,7 +47,7 @@ fun PopularRatesScreen(
             )
         } else {
             currencyRates.forEach { currencyRatesModel ->
-                val isFavorite = currencyRatesModel.isQuoteFavorite
+                val isFavorite = true
                 val icon = if (isFavorite) painterResource(id = R.drawable.ic_baseline_star_checked)
                 else painterResource(id = R.drawable.ic_baseline_star_border_unchecked)
                 Row(
@@ -66,7 +66,7 @@ fun PopularRatesScreen(
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = currencyRatesModel.rate.value,
+                            text = currencyRatesModel.rate.toString(),
                             style = MaterialTheme.typography.h5
                         )
                         Spacer(modifier = Modifier.width(32.dp))
@@ -100,15 +100,11 @@ private fun PreviewPopularRatesScreen() {
                 base = Symbol.EUR,
                 quote = Symbol.USD,
                 rate = 1.2,
-                isQuoteFavorite = false,
-                timestamp = 0L,
             ),
             RatesModel(
                 base = Symbol.EUR,
                 quote = Symbol.GBP,
                 rate = 0.9,
-                isQuoteFavorite = true,
-                timestamp = 0L,
             )
         ),
         viewModel = null,
